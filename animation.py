@@ -41,13 +41,15 @@ class gameData():
 #        self.button2 = Button(self.frame, text="Don't press me!")
 #        self.button2.grid()
         # Canvas
-        self.canvas = Canvas(self.frame, width=100, height=100, bg="black")
+        self.canvas = Canvas(self.frame, width=100, height=100, bg="red")
 
         self.canvas.grid()
         # Bitmap
+        self.crtSprite = 0
         self.spritesheet = Image.open("./assets/NES - Final Fantasy - Light Warriors.png")
-        self.sprites = [(ImageTk.PhotoImage(self.spritesheet.crop((181,36,196,58))))]
-        self.crtSprite = None
+        for crtSprite in range(3):
+            self.sprites = [(ImageTk.PhotoImage(self.spritesheet.crop((181 + (crtSprite * 15),36,196 + (crtSprite * 15),58))))]
+
 
         self.update(0)
 
@@ -55,7 +57,7 @@ class gameData():
         self.canvas.delete(self.crtSprite)
         self.crtSprite = self.sprites[sprite]
         self.canvas.create_image(0,0,image=self.crtSprite, anchor=NW)
-        self.window.after(500, self.update, 0)
+        self.window.after(1000, self.update, 0)
 
 if __name__ == '__main__':
     gdata = gameData()
