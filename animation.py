@@ -41,23 +41,30 @@ class gameData():
 #        self.button2 = Button(self.frame, text="Don't press me!")
 #        self.button2.grid()
         # Canvas
-        self.canvas = Canvas(self.frame, width=100, height=100, bg="red")
+        self.canvas = Canvas(self.frame, width=100, height=100, bg="black")
 
         self.canvas.grid()
         # Bitmap
+        self.spritesheet = Image.open("./assets/Explosion.png")
+        self.sprites = []
+        x1 = 0 
+        y1 = 0
+        x2 = 14
+        y2 = 15
         self.crtSprite = 0
-        self.spritesheet = Image.open("./assets/NES - Final Fantasy - Light Warriors.png")
-        for crtSprite in range(3):
-            self.sprites = [(ImageTk.PhotoImage(self.spritesheet.crop((181 + (crtSprite * 15),36,196 + (crtSprite * 15),58))))]
-
-
+        for crtSprite in range(6):
+            img = self.spritesheet.crop((x1 + (self.crtSprite * 15), y1, x2 + (self.crtSprite * 15), y2))
+            img = img.resize((100,100))
+            self.sprites.append(ImageTk.PhotoImage(img))
+            self.crtSprite = self.crtSprite + 1
+        self.crtSprite = 0
         self.update(0)
 
     def update(self, sprite):
-        self.canvas.delete(self.crtSprite)
+        self.canvas.delete("all")
         self.crtSprite = self.sprites[sprite]
         self.canvas.create_image(0,0,image=self.crtSprite, anchor=NW)
-        self.window.after(1000, self.update, 0)
+        self.window.after(100, self.update, (sprite + 1) % 6)
 
 if __name__ == '__main__':
     gdata = gameData()
