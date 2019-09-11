@@ -41,7 +41,7 @@ class gameData():
 #        self.button2 = Button(self.frame, text="Don't press me!")
 #        self.button2.grid()
         # Canvas
-        self.canvas = Canvas(self.frame, width=100, height=100, bg="black")
+        self.canvas = Canvas(self.frame, width=100, height=100)
 
         self.canvas.grid()
         # Bitmap
