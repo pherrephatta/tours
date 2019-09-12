@@ -73,4 +73,15 @@ class Jeu():
     
     def creerSentier(self):
         self.sentier = Sentier(self)
+
+class Partie():
+    def __init__(self):
+       self.tabCreeps = []
+       self.tabToursPlacees = []
+       self.ptsVieJoueur # TODO: determiner pts de vie
+       self.argentJoeur # TODO: argent initial
+       self.tabVague = []
+
+
+
            
