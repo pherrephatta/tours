@@ -2,7 +2,6 @@
 import interface_modele as im #alias !
 import interface_vue as iv #alias !
 
-
 class Controleur():
     def __init__(self):
         self.jeu=im.Jeu(self)
