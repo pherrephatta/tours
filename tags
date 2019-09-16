@@ -21,7 +21,6 @@ Timer	interface_modele.py	/^class Timer():$/;"	c
 Tour	interface_modele.py	/^class Tour():$/;"	c
 Vague	interface_modele.py	/^class Vague():$/;"	c
 Vue	interface_vue.py	/^class Vue():$/;"	c
-__init__	animation.py	/^    def __init__(self):$/;"	m	class:gameData
 __init__	interface_controleur.py	/^    def __init__(self):$/;"	m	class:Controleur
 __init__	interface_modele.py	/^    def __init__(self, controleur, largeur=800, hauteur=600):$/;"	m	class:Jeu
 __init__	interface_modele.py	/^    def __init__(self, jeu):$/;"	m	class:Partie
@@ -67,8 +66,6 @@ effacerAnimationPrecedente	interface_vue.py	/^    def effacerAnimationPrecedente
 event_click	interface_controleur.py	/^    def event_click(self,position):$/;"	m	class:Controleur
 event_click	interface_modele.py	/^    def event_click(self,position):$/;"	m	class:Jeu
 faireAction	interface_modele.py	/^    def faireAction(self):$/;"	m	class:Jeu
-gameData	animation.py	/^class gameData():$/;"	c
-gdata	animation.py	/^    gdata = gameData()$/;"	v
 genererAiresConstruction	interface_modele.py	/^    def genererAiresConstruction(self):$/;"	m	class:Niveau
 genererIconesTours	interface_modele.py	/^    def genererIconesTours(self):$/;"	m	class:Niveau
 getAngledPoint	helper.py	/^    def getAngledPoint(angle,longueur,cx,cy):$/;"	m	class:Helper
@@ -82,7 +79,6 @@ siCreepDansRangeTour	interface_modele.py	/^    def siCreepDansRangeTour(self, cr
 soustrairePtsVieCreep	interface_modele.py	/^    def soustrairePtsVieCreep(self, projectile):$/;"	m	class:Creep
 suivreSentier	interface_modele.py	/^    def suivreSentier(self):$/;"	m	class:Creep
 transfererValeurCreep	interface_modele.py	/^    def transfererValeurCreep(self):$/;"	m	class:Creep
-update	animation.py	/^    def update(self, sprite):$/;"	m	class:gameData
 v	interface_vue.py	/^    v=Vue(None)$/;"	v
 verifierAtteinteCible	interface_modele.py	/^    def verifierAtteinteCible(self, creep):$/;"	m	class:Projectile
 verifierSiCreepEstMort	interface_modele.py	/^    def verifierSiCreepEstMort(self):$/;"	m	class:Creep
