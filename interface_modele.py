@@ -1,7 +1,9 @@
 # -*- coding: iso-8859-1 -*-
+import threading
+
+#TODO: projectiles trajectoire
 
 #****Temporaire: j'ai mis dans les classes seulement les éléments dont j'avais besoin. Elles sont à compléter.****
-
 # Ajouts et Modifications (15/09/2019):
 # - Classes Rect, Cercle, Point
 # - Vague() -> Vague(nbCreeps)
@@ -9,13 +11,25 @@
 # - Partie.niveaux = []
 # - Niveau.vagues = []
 
+class Timer():
+    def __init__(self, jeu):
+        self.thread = Thread(None, self.jeu.niveau[0])
+        self.prtJeu = jeu
+        self.time = 0
+        self.incrTime()
+
+    def incrTime(self):
+        threading.Timer(1.0, self.incrTime).start
+        self.time = self.time + 1
+        print(self.time)
+
 class Jeu():
     def __init__(self, controleur, largeur=800, hauteur=600):
         self.prtControleur = controleur
         self.largeur = largeur
         self.hauteur = hauteur
         self.partie = Partie(self) #le jeu génère ses parties
-        self.listProjectiles=[] #TODO: mettre a un endroit plus approprier
+        self.listProjectiles=[] #TODO: mettre a un endroit plus approprier (Tour)
 
     def faireAction(self):
         for i in self.partie.niveaux[0].vagues[0].listCreeps:
@@ -27,7 +41,6 @@ class Jeu():
     def verifierCreepDansRangeTour(self, creep, tour):
         if abs(tour.posX - creep.positionX) < tour.range:
             if abs(tour.posY - creep.positionY) < tour.range:
-                print("FEU !!")
                 #TODO: discuter frequence de creation des projectiles (timer?)
                 if (creep.positionX % tour.freqAttaque) == 0 and (creep.positionY % tour.freqAttaque == 0):
                     tour.attaqueDeTour(creep)
@@ -87,15 +100,16 @@ class Vague():
     def __init__(self, niveau, nbCreeps):
         self.prtNiveau = niveau
         self.listCreeps = []
+        self.activeCreeps = []
         self.nbCreeps = nbCreeps
+        self.nbCreepsActif = 0
 #        self.nbCreep = self.prtNiveau.nbCreepsDansUneVague #TODO: Creeps dans une vague
         self.creerCreep()
 
     def creerCreep(self):
         #TODO: ajouter differents type de creep, etc.
-        for i in range(self.nbCreeps):
-            creep = Creep(self)
-            self.listCreeps.append(creep)
+        creep = Creep(self)
+        self.listCreeps.append(creep)
 
 #TODO: generaliser la creation de sentier?
 class Sentier():
@@ -184,7 +198,6 @@ class Tour():
     def calculerTrajectoire(self, creep):
         # creep = self.parent.vague.tabCreeps[indCreep] #Je ne suis pas décidée de comment on déclenche les attaques... en fonction des creeps qui se déplacent ?
         cible=[creep.positionX, creep.positionY]
-        print("La cible est ", cible)
         if cible[0] < self.posX:
             self.trajectoireX = -1
         elif cible[0] > self.posX:

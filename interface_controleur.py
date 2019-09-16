@@ -5,8 +5,8 @@ import interface_vue as iv
 
 class Controleur():
     def __init__(self):
-        self.jeu=im.Jeu(self)
-        self.vue=iv.Vue(self)
+        self.jeu = im.Jeu(self)
+        self.vue = iv.Vue(self)
         self.vue.disposerEcran(self.jeu.partie.niveaux[0].sentier)
         self.animer()
 #        self.dessinerAiresConstruction()
