@@ -33,7 +33,7 @@ class Vue():
 
     def afficherCreeps(self, vague):
         for i in vague.listCreeps:
-            creep=self.canevasDessin.create_oval(i.positionX, i.positionY, i.positionX+10, i.positionY+10, fill="yellow")
+            creep=self.canevasDessin.create_oval(i.positionX, i.positionY, i.positionX+10, i.positionY+10, fill="yellow", tags=("creep"))
             self.creepsAEffacer.append(creep)
 
     def effacerAnimationPrecedente(self):
@@ -44,12 +44,9 @@ class Vue():
             self.canevasDessin.delete(j)
         self.projectilesAEffacer.clear()
 
-    def afficherTour(self, tour):
-        self.canevasDessin.create_rectangle(tour.posX, tour.posY, tour.posX+30, tour.posY+30, fill="white")
-
     def afficherProjectiles(self, jeu):
         for i in jeu.listProjectiles:
-            projectile=self.canevasDessin.create_rectangle(i.posX, i.posY, i.posX+5, i.posY+5, fill="red")
+            projectile=self.canevasDessin.create_rectangle(i.posX, i.posY, i.posX+5, i.posY+5, fill="red", tags=("projectile"))
             self.projectilesAEffacer.append(projectile)
 
     #TODO: Pour l'instant c'est un rectangle mais on pourra facilement importer des sprites
@@ -70,13 +67,12 @@ class Vue():
                                           tour.posY+tour.hauteur,fill=tour.couleur)
 
     #Dessine toutes les tours d'un aire de jeu. Éventuellement ce sera selon le type choisi.
-    def dessinerTours(self, listTours):
-        for i in listTours:
-            if i.type=="Tour":
-                self.dessinerUneTour(i)
+    def dessinerTour(self, tour):
+        if (tour.type=="Tour"):
+            self.dessinerUneTour(tour)
 
     #TODO: Pour l'instant il n'y a qu'un seul type d'icone de tour. Éventuellement chaque type de tour aura sa fonction dessiner
-    #TODO: Pour l'instan c'est un rectangle mais on pourra facilement importer des sprites
+    #TODO: Pour l'instant c'est un rectangle mais on pourra facilement importer des sprites
     def dessinerUneIconeTour(self,iconeTour):
         self.canevasDessin.create_rectangle(iconeTour.posX-iconeTour.largeur,iconeTour.posY-iconeTour.hauteur,
                                       iconeTour.posX+iconeTour.largeur, iconeTour.posY+iconeTour.hauteur,
@@ -88,6 +84,10 @@ class Vue():
         for i in listIconesTours:
             if i.type=="Tour":
                 self.dessinerUneIconeTour(i)
+
+    # Détecte un événement "click bouton gauche de la souris"
+    def detecterClick(self):
+        self.canevasDessin.bind("<Button-1>", self.prtControleur.event_click)
 
 if __name__ == '__main__':
     v=Vue(None)
