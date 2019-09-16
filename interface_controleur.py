@@ -7,7 +7,7 @@ class Controleur():
     def __init__(self):
         self.jeu = im.Jeu(self)
         self.vue = iv.Vue(self)
-        self.vue.disposerEcran(self.jeu.partie.niveaux[0].sentier)
+        self.vue.disposerEcran(self.jeu.partie.niveau.sentier)
         self.animer()
 #        self.dessinerAiresConstruction()
 #        self.dessinerTours()
@@ -16,8 +16,8 @@ class Controleur():
     def animer(self):
         self.vue.effacerAnimationPrecedente()
         self.jeu.faireAction()
-        self.vue.afficherCreeps(self.jeu.partie.niveaux[0].vagues[0])
-        self.vue.afficherTour(self.jeu.partie.niveaux[0].tour)
+        self.vue.afficherCreeps(self.jeu.partie.niveau.vagues[0])
+        self.vue.afficherTour(self.jeu.partie.niveau.tour)
         self.vue.afficherProjectiles(self.jeu)
         self.vue.root.after(50,self.animer)
 
@@ -25,13 +25,13 @@ class Controleur():
     #ses niveaux. Il faudra discuter si on veut passer par le contrôleur pour ces éléments.
 
     def dessinerAiresConstruction(self):
-        self.vue.dessinerAires(self.jeu.partie.niveaux[0].listAires)
+        self.vue.dessinerAires(self.jeu.partie.niveau.listAires)
 
     def dessinerTours(self):
-        self.vue.dessinerTours(self.jeu.partie.niveaux[0].listTours)
+        self.vue.dessinerTours(self.jeu.partie.niveau.listTours)
 
     def dessinerIconesTours(self):
-        self.vue.dessinerIconesTours(self.jeu.partie.niveaux[0].listIconesTours)
+        self.vue.dessinerIconesTours(self.jeu.partie.niveau.listIconesTours)
 
 if __name__ == '__main__':
     c=Controleur()

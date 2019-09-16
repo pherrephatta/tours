@@ -1,15 +1,16 @@
 # -*- coding: iso-8859-1 -*-
 import threading
+import helper
 
 #TODO: projectiles trajectoire
+#TODO: sprites temporaires sur les icones de tours
+#TODO: delai de creeps
+#           - after -> timer
+#           - global thread
+#           - relative positions
+#           - event threads
+#TODO: integrer julie vue, modele
 
-#****Temporaire: j'ai mis dans les classes seulement les éléments dont j'avais besoin. Elles sont à compléter.****
-# Ajouts et Modifications (15/09/2019):
-# - Classes Rect, Cercle, Point
-# - Vague() -> Vague(nbCreeps)
-# - creerCreeps()
-# - Partie.niveaux = []
-# - Niveau.vagues = []
 
 class Timer():
     def __init__(self, jeu):
@@ -32,11 +33,13 @@ class Jeu():
         self.listProjectiles=[] #TODO: mettre a un endroit plus approprier (Tour)
 
     def faireAction(self):
-        for i in self.partie.niveaux[0].vagues[0].listCreeps:
+        for i in self.partie.niveau.vagues[0].listCreeps:
             i.suivreSentier()
-            self.verifierCreepDansRangeTour(i, self.partie.niveaux[0].tour) #TODO: revoir comment on passe les tours en référence
+            self.verifierCreepDansRangeTour(i, self.partie.niveau.tour) #voir comment on passe les tours en référence, ici c'est test
         for j in self.listProjectiles:
-            j.deplacerProjectiles()
+            j.deplacerProjectile(j.creep)
+            if (j.verifierAtteinteCible(j.creep)):
+                self.listProjectiles.remove(j)
 
     def verifierCreepDansRangeTour(self, creep, tour):
         if abs(tour.posX - creep.positionX) < tour.range:
@@ -53,7 +56,7 @@ class Partie():
         self.listAiresN1 = ([100,100],[200,100],[300,100]) #positions des tours sur l'aire de jeu
         self.listToursN1 = ('Tour', 'None', 'Tour') #TODO: ce tableau sera rempli lors des phases de construction
         self.listIconesToursN1 = ([100,500],[200,500]) #Positions de icones de construction des tours sur l'aire de jeu
-        self.niveaux = [Niveau(self)] #TODO: la partie génère ses niveaux
+        self.niveau = Niveau(self) #TODO: la partie génère ses niveaux
 
 class Niveau():
     def __init__(self, partie):
@@ -145,7 +148,7 @@ class Creep():
         self.positionX = self.prtVague.prtNiveau.sentier.coord0[0]
         self.positionY = self.prtVague.prtNiveau.sentier.coord0[1]
         self.ptsVie = 3 #TODO: cette variable devra être passée en argument par la vague
-        self.vitesse = 2 #TODO: cette variable devra être passée en argument par la vague
+        self.vitesse = 5 #TODO: cette variable devra être passée en argument par la vague
         self.valeur = 10 #TODO: cette variable devra être passée en argument par la vague
         self.puissanceDommage = 1 #TODO: cette variable devra être passée en argument par la vague
 
@@ -190,31 +193,37 @@ class Tour():
         self.posY = y
         self.couleur = "dim grey"
         self.type = "Tour" #TODO: plusieurs types de tour seront implantés
-        self.range=130
+        self.range = 200
         self.freqAttaque = 25
-        self.trajectoireX = 0
-        self.trajectoireY= 0
+        #TODO: Ajuster trajectoire, etc.
+#        self.trajectoireX = 0
+#        self.trajectoireY= 0
+#        self.cible
 
-    def calculerTrajectoire(self, creep):
-        # creep = self.parent.vague.tabCreeps[indCreep] #Je ne suis pas décidée de comment on déclenche les attaques... en fonction des creeps qui se déplacent ?
-        cible=[creep.positionX, creep.positionY]
-        if cible[0] < self.posX:
-            self.trajectoireX = -1
-        elif cible[0] > self.posX:
-            self.trajectoireX = +1
-        else:
-            trajectoireX = 0
-        if cible[1] < self.posY:
-            self.trajectoireY = -1
-        elif cible[1] > self.posY:
-            self.trajectoireY = +1
-        else:
-            self.trajectoireY = 0
+    def calculerAngleVersCible(self, creep):
+        angle = helper.Helper.calcAngle(self.posXtour,self.posYtour,creep.positionX,creep.positionY)
+        return angle
+
+    def calculerDistanceTourCible(self,creep):
+        distance = helper.Helper.calcDistance(self.posXtour,self.posYtour,creep.positionX,creep.positionY)
+        return distance
+
+    def calculerPointAttaque(self, angle, distance, x,y):
+        ptAttaque = helper.Helper.getAngledPoint(angle,distance,x,y)
+        return ptAttaque
 
     def attaqueDeTour(self, creep):
-        self.calculerTrajectoire(creep)
+        #self.calculerTrajectoire(creep)
         #cibleAvecDepAnticipe=[cible[0]+creep.vitesse, cible[1]+creep.vitesse] #voir pour raffiner selon deplacement et position tour
-        projectile=Projectile(self)
+        #angle = self.calculerAngleVersCible(creep)
+        #distance = self.calculerDistanceTourCible(creep)
+        #ptAttaque = self.calculerPointAttaque(angle, distance, self.posXtour, self.posYtour)
+        #print("angle de tir: ", angle)
+        #print("distance de tir: ", distance)
+        #print("ptAttaque: ", ptAttaque)
+        #print ("position creep: ", creep.positionX, creep.positionY)
+        #input ("stop test")
+        projectile = Projectile(self, creep)
         print("Projectile créé")
         self.prtNiveau.prtPartie.prtJeu.listProjectiles.append(projectile)
 
@@ -233,16 +242,47 @@ class IconeTour():
         self.tour.hauteur=self.tour.hauteur/2
 
 class Projectile():
-    def __init__(self, tour): # parent = tour
+    def __init__(self, tour, creep): # parent = tour
         self.prtTour = tour
         self.posX=self.prtTour.posX
         self.posY=self.prtTour.posY
-        self.puissance=1
+        self.puissance = 1
         self.vitesse = 50
+        self.creep = creep
+        self.trajectoireX = 0
+        self.trajectoireY = 0
+        self.calculerTrajectoire(self.creep)
 
-    def deplacerProjectiles(self):
-        self.posX += (self.vitesse * self.prtTour.trajectoireX)
-        self.posY += (self.vitesse * self.prtTour.trajectoireY)
+    def deplacerProjectile(self, creep):
+        self.posX += (self.vitesse * self.trajectoireX)
+        self.posY += (self.vitesse * self.trajectoireY)
+
+    def verifierAtteinteCible(self, creep):
+        buffer = 50 #eventuellement sera hit box du creep
+        if ( abs(self.posX - creep.positionX) <= buffer):
+            if ( abs(self.posY - creep.positionY) <= buffer):
+                print("cible touchée! ")
+                return True
+        return False
+
+    #TODO: Pas bon -- modifier trajectoire
+    def calculerTrajectoire(self, creep):
+        # creep = self.parent.vague.tabCreeps[indCreep] #Je ne suis pas décidée de comment on déclenche les attaques... en fonction des creeps qui se déplacent ?
+        cible=[creep.positionX, creep.positionY]
+        if cible[0] < self.posX:
+            self.trajectoireX = -1
+        elif cible[0] > self.posX:
+            self.trajectoireX = +1
+        else:
+            trajectoireX = 0
+        if cible[1] < self.posY:
+            self.trajectoireY = -1
+        elif cible[1] > self.posY:
+            self.trajectoireY = +1
+        else:
+            self.trajectoireY = 0
+
+
 
 class Cercle():
     def __init__(self, x, y, rayon):
