@@ -1,62 +1,93 @@
 # -*- coding: iso-8859-1 -*-
-import threading
+
 import helper
 
-#TODO: projectiles trajectoire
-#TODO: sprites temporaires sur les icones de tours
-#TODO: delai de creeps
-#           - after -> timer
-#           - global thread
-#           - relative positions
-#           - event threads
-#TODO: integrer julie vue, modele
-
-
-class Timer():
-    def __init__(self, jeu):
-        self.thread = Thread(None, self.jeu.niveau[0])
-        self.prtJeu = jeu
-        self.time = 0
-        self.incrTime()
-
-    def incrTime(self):
-        threading.Timer(1.0, self.incrTime).start
-        self.time = self.time + 1
-        print(self.time)
+# Modifications (16/09/2019):
+# Ajout de Timer.
+# hitBox -> rect
+# Partie.listToursN1 est supprimer (jamais utiliser)
+# Vague.creerCreep -> creerCreeps
+#TODO: Trajectoire de projectile
+#TODO: Delai de creeps est pas encore 100%
 
 class Jeu():
     def __init__(self, controleur, largeur=800, hauteur=600):
         self.prtControleur = controleur
+        self.timer = Timer(self)
         self.largeur = largeur
         self.hauteur = hauteur
-        self.partie = Partie(self) #le jeu génère ses parties
-        self.listProjectiles=[] #TODO: mettre a un endroit plus approprier (Tour)
+        self.partie = Partie(self) # le jeu génère ses parties
+        self.listProjectiles=[] #TODO: mettre a un endroit plus approprier (Tour?)
+        self.typeAconstruire = "None" # tour a construire, selectionne par le joueur
 
     def faireAction(self):
+        # Faire bouger les creeps et attaquer avec tours
         for i in self.partie.niveau.vagues[0].listCreeps:
             i.suivreSentier()
-            self.verifierCreepDansRangeTour(i, self.partie.niveau.tour) #voir comment on passe les tours en référence, ici c'est test
+            for j in self.partie.niveau.listTours:
+                self.siCreepDansRangeTour(i, j) #voir comment on passe les tours en référence, ici c'est test
+        # Animer projectiles et effet sur les creeps
         for j in self.listProjectiles:
             j.deplacerProjectile(j.creep)
             if (j.verifierAtteinteCible(j.creep)):
                 self.listProjectiles.remove(j)
+                j.creep.soustrairePtsVieCreep(j)
+                if (j.creep.verifierSiCreepEstMort()):
+                    self.partie.niveau.vagues[0].listCreeps.remove(j.creep)
+                    j.creep.transfererValeurCreep()
 
-    def verifierCreepDansRangeTour(self, creep, tour):
+    def siCreepDansRangeTour(self, creep, tour):
         if abs(tour.posX - creep.positionX) < tour.range:
             if abs(tour.posY - creep.positionY) < tour.range:
                 #TODO: discuter frequence de creation des projectiles (timer?)
                 if (creep.positionX % tour.freqAttaque) == 0 and (creep.positionY % tour.freqAttaque == 0):
                     tour.attaqueDeTour(creep)
 
+    # Fonction appelée par le contrôleur lorsque la vue détecte un click gauche de la souris.
+    # position = position du curseur de la souris lors du click.
+    def event_click(self,position):
+        print("Click à",position.x,position.y)
+        if(self.typeAconstruire=="None"):
+            for t in self.partie.niveau.listIconesTours:
+                if(t.rect.isInside(position.x,position.y)):
+                    self.typeAconstruire=t.type
+                    print("Dans icone")
+                else:
+                    print("Pas dans icone")
+        else:
+            emplacementLibre=True
+            for i in self.partie.niveau.listAires:
+                if(i.rect.isInside(position.x,position.y)): #Vérifie si le joueur click sur une aire de construction
+                    for t in self.partie.niveau.listTours: #Véfifie si l'aire de construction est libre
+                        if((t.posX==i.posX) and (t.posY ==(i.posY-t.hauteur))):
+                           print("emplacement non libre")
+                           emplacementLibre=False
+                    if(emplacementLibre==True):
+                        self.partie.niveau.construireTour(self.typeAconstruire, i.posX, i.posY)
+                        self.typeAconstruire="None"
+
+class Timer():
+    def __init__(self, jeu):
+        self.prtControleur = jeu
+        self.msTime = 0 # nb de 100ms
+        self.time = 0 # nb de secondes
+
+#        self.tick()
+#    def tick(self):
+#        self.msTime += 1
+#        self.time = self.msTime / 10
+#        self.prtControleur.vue.root.after(100, self.tick)
+
 class Partie():
     def __init__(self, jeu):
         self.prtJeu = jeu
         self.niveauCourant = 1
         #normalement tous ces tableaux seraient dans une base de donnée. Par manque de temps ils sont définis ici.
-        self.listAiresN1 = ([100,100],[200,100],[300,100]) #positions des tours sur l'aire de jeu
-        self.listToursN1 = ('Tour', 'None', 'Tour') #TODO: ce tableau sera rempli lors des phases de construction
+        self.listAiresN1 = ([100,100],[200,100],[300,100],[400,250]) #positions des tours sur l'aire de jeu
+#        self.listToursN1 = ('Tour', 'None', 'Tour') # rempli lors des phases de construction (marche sans)
         self.listIconesToursN1 = ([100,500],[200,500]) #Positions de icones de construction des tours sur l'aire de jeu
-        self.niveau = Niveau(self) #TODO: la partie génère ses niveaux
+        self.niveau = Niveau(self) #TODO: la partie génère DES niveaux?
+        self.argentJoueur = 500 #valeur à déterminer
 
 class Niveau():
     def __init__(self, partie):
@@ -66,33 +97,26 @@ class Niveau():
         self.listIconesTours = [] # Les icones pour chaque tour
         self.sentier = Sentier(self)
         self.vagues = [Vague(self, 5)] #TODO: Determiner nombre de creeps, types, etc.
-        self.tour = Tour(self, 300, 100) #TODO: Position temporaire, pref. une liste
-#        self.nbCreepsDansUneVague = 1 #TODO: A determiner
-        self.creationAiresConstruction()
-        self.creationTours()
-        self.creationIconesTours()
+        self.genererAiresConstruction()
+        self.genererIconesTours()
 
-        #Création des aires de construction selon le tableau défini dans la classe Partie
-    def creationAiresConstruction(self):
+    #Création d'une tour
+    def construireTour(self, type, x,y): #x et y sont les coordonnées de l'aire de construction
+        if (type=="Tour"):
+            tour=Tour(self,x,y)
+            tour.posY=tour.posY-tour.hauteur#On ne veut pas que le centre de la tour soit au centre de l'aire de construction. y-tour.hauteur -> pour que ce soit la base de la tour qui est sur l'aire.
+            self.listTours.append(tour)
+            self.prtPartie.prtJeu.prtControleur.nouvelleTour(tour)
+
+    #Création des aires de construction selon le tableau défini dans la classe Partie
+    def genererAiresConstruction(self):
         if self.prtPartie.niveauCourant==1: #On n'a pas besoin de créer un objet "partie" dans niveau pour accès à ces attributs
             for x,y in self.prtPartie.listAiresN1:
                 aire=AireDeConstruction(self,x,y)
                 self.listAires.append(aire)
 
-    #Création des tours selon le tableau défini dans la classe Partie
-    def creationTours(self):
-        index=0
-        if self.prtPartie.niveauCourant==1:
-            for i in self.prtPartie.listToursN1: #
-                if i=="Tour":  #Éventuellement il va y avoir un if par type de tour
-                    x,y=self.prtPartie.listAiresN1[index]
-                    tour=Tour(self,x,y)
-                    tour.posY=tour.posY-tour.hauteur #Pour que ce soit la base de la tour qui soit au centre de l'aire de construction
-                    self.listTours.append(tour)
-                index=index+1
-
     #Création des icones de tour selon le tableau défini dans la classe Partie
-    def creationIconesTours(self):
+    def genererIconesTours(self):
         if self.prtPartie.niveauCourant==1:
             for x,y in self.prtPartie.listIconesToursN1:
                 iconeTour=IconeTour(self,x,y)
@@ -103,16 +127,17 @@ class Vague():
     def __init__(self, niveau, nbCreeps):
         self.prtNiveau = niveau
         self.listCreeps = []
-        self.activeCreeps = []
-        self.nbCreeps = nbCreeps
+        self.nbCreepsTotal = nbCreeps
         self.nbCreepsActif = 0
-#        self.nbCreep = self.prtNiveau.nbCreepsDansUneVague #TODO: Creeps dans une vague
         self.creerCreep()
 
     def creerCreep(self):
         #TODO: ajouter differents type de creep, etc.
-        creep = Creep(self)
-        self.listCreeps.append(creep)
+        if self.prtNiveau.prtPartie.prtJeu.timer.msTime % 10 == 0:
+            self.listCreeps.append(Creep(self))
+            self.nbCreepsActif += 1
+        elif self.nbCreepsActif < self.nbCreepsTotal:
+            self.creerCreep()
 
 #TODO: generaliser la creation de sentier?
 class Sentier():
@@ -135,12 +160,13 @@ class Sentier():
 
 class AireDeConstruction():
     def __init__(self, parent,x,y):
-        self.parent=parent #TODO: parent -> ?
+        self.parent=parent
         self.largeur=25
         self.hauteur=5
         self.posX=x
         self.posY=y
         self.couleur="brown"
+        self.rect = Rect(self.posX, self.posY, self.largeur,self.hauteur)
 
 class Creep():
     def __init__(self, vague):
@@ -156,7 +182,6 @@ class Creep():
         # print("coordonnées Y de départ du Creep: ", self.positionY)
 
         #TODO: collison box ? ou calcul d'un range p/r à sa position pour l'éliminer
-
 
     def suivreSentier(self):
         if self.positionX <  self.prtVague.prtNiveau.sentier.coord1[0]:
@@ -184,6 +209,17 @@ class Creep():
             self.positionY -= self.vitesse
             #print("c8")
 
+    def soustrairePtsVieCreep(self, projectile):
+        self.ptsVie -= projectile.puissance
+
+    def verifierSiCreepEstMort(self):
+        if self.ptsVie <= 0:
+            return True
+
+    def transfererValeurCreep(self):
+        self.prtVague.prtNiveau.prtPartie.argentJoueur += self.valeur
+        #argentJoueur est dans partie
+
 class Tour():
     def __init__(self, niveau,x,y):
         self.prtNiveau = niveau
@@ -192,7 +228,7 @@ class Tour():
         self.posX = x
         self.posY = y
         self.couleur = "dim grey"
-        self.type = "Tour" #TODO: plusieurs types de tour seront implantés
+        self.type = "Tour" #TODO: plusieurs types de tour seront implemantes
         self.range = 200
         self.freqAttaque = 25
         #TODO: Ajuster trajectoire, etc.
@@ -201,11 +237,11 @@ class Tour():
 #        self.cible
 
     def calculerAngleVersCible(self, creep):
-        angle = helper.Helper.calcAngle(self.posXtour,self.posYtour,creep.positionX,creep.positionY)
+        angle = helper.Helper.calcAngle(self.posX,self.posY,creep.positionX,creep.positionY)
         return angle
 
     def calculerDistanceTourCible(self,creep):
-        distance = helper.Helper.calcDistance(self.posXtour,self.posYtour,creep.positionX,creep.positionY)
+        distance = helper.Helper.calcDistance(self.posX,self.posY,creep.positionX,creep.positionY)
         return distance
 
     def calculerPointAttaque(self, angle, distance, x,y):
@@ -240,6 +276,7 @@ class IconeTour():
         #Prend une image de tour et la réduit de moitié. C'est cette image qui apparait à l'intérieur de l'icone
         self.tour.largeur=self.tour.largeur/2
         self.tour.hauteur=self.tour.hauteur/2
+        self.rect = Rect(self.posX, self.posY, self.largeur,self.hauteur)
 
 class Projectile():
     def __init__(self, tour, creep): # parent = tour
@@ -282,15 +319,13 @@ class Projectile():
         else:
             self.trajectoireY = 0
 
-
-
 class Cercle():
     def __init__(self, x, y, rayon):
         self.x = x
         self.y = y
         self.r = rayon
 
-    def siDansCercle(self, x, y):
+    def isInside(self, x, y):
         delta = pow((x - self.x), 2) + pow((x - self.x), 2)
         if delta > pow(self.r, 2):
             return False
@@ -303,10 +338,9 @@ class Rect():
         self.largeur = largeur
         self.hauteur = hauteur
 
-    def siDansRect(self, x, y):
-        if x > self.x and x < self.x + self.largeur:
-            if y > self.y and y < self.y + self.hauteur:
-                return True
+    def isInside(self, x, y):
+        if x > self.x and x < self.x + self.largeur and y > self.y and y < self.y + self.hauteur:
+            return True
         else:
             return False
 

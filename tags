@@ -9,14 +9,15 @@ AireDeConstruction	interface_modele.py	/^class AireDeConstruction():$/;"	c
 Cercle	interface_modele.py	/^class Cercle():$/;"	c
 Controleur	interface_controleur.py	/^class Controleur():$/;"	c
 Creep	interface_modele.py	/^class Creep():$/;"	c
+Helper	helper.py	/^class Helper(object):$/;"	c
 IconeTour	interface_modele.py	/^class IconeTour():$/;"	c
 Jeu	interface_modele.py	/^class Jeu():$/;"	c
 Niveau	interface_modele.py	/^class Niveau():$/;"	c
 Partie	interface_modele.py	/^class Partie():$/;"	c
-Point	interface_modele.py	/^class Point():$/;"	c
 Projectile	interface_modele.py	/^class Projectile():$/;"	c
 Rect	interface_modele.py	/^class Rect():$/;"	c
 Sentier	interface_modele.py	/^class Sentier():$/;"	c
+Timer	interface_modele.py	/^class Timer():$/;"	c
 Tour	interface_modele.py	/^class Tour():$/;"	c
 Vague	interface_modele.py	/^class Vague():$/;"	c
 Vue	interface_vue.py	/^class Vue():$/;"	c
@@ -24,49 +25,64 @@ __init__	animation.py	/^    def __init__(self):$/;"	m	class:gameData
 __init__	interface_controleur.py	/^    def __init__(self):$/;"	m	class:Controleur
 __init__	interface_modele.py	/^    def __init__(self, controleur, largeur=800, hauteur=600):$/;"	m	class:Jeu
 __init__	interface_modele.py	/^    def __init__(self, jeu):$/;"	m	class:Partie
+__init__	interface_modele.py	/^    def __init__(self, jeu):$/;"	m	class:Timer
 __init__	interface_modele.py	/^    def __init__(self, niveau):  # parent = niveau$/;"	m	class:Sentier
 __init__	interface_modele.py	/^    def __init__(self, niveau, nbCreeps):$/;"	m	class:Vague
 __init__	interface_modele.py	/^    def __init__(self, niveau,x,y):$/;"	m	class:Tour
 __init__	interface_modele.py	/^    def __init__(self, parent,x,y):$/;"	m	class:AireDeConstruction
 __init__	interface_modele.py	/^    def __init__(self, parent,x,y):$/;"	m	class:IconeTour
 __init__	interface_modele.py	/^    def __init__(self, partie):$/;"	m	class:Niveau
-__init__	interface_modele.py	/^    def __init__(self, tour): # parent = tour$/;"	m	class:Projectile
+__init__	interface_modele.py	/^    def __init__(self, tour, creep): # parent = tour$/;"	m	class:Projectile
 __init__	interface_modele.py	/^    def __init__(self, vague):$/;"	m	class:Creep
-__init__	interface_modele.py	/^    def __init__(self, x, y):$/;"	m	class:Point
 __init__	interface_modele.py	/^    def __init__(self, x, y, largeur, hauteur):$/;"	m	class:Rect
 __init__	interface_modele.py	/^    def __init__(self, x, y, rayon):$/;"	m	class:Cercle
 __init__	interface_vue.py	/^    def __init__(self, controleur):$/;"	m	class:Vue
 afficherCreeps	interface_vue.py	/^    def afficherCreeps(self, vague):$/;"	m	class:Vue
 afficherProjectiles	interface_vue.py	/^    def afficherProjectiles(self, jeu):$/;"	m	class:Vue
-afficherTour	interface_vue.py	/^    def afficherTour(self, tour):$/;"	m	class:Vue
 animer	interface_controleur.py	/^    def animer(self):$/;"	m	class:Controleur
 attaqueDeTour	interface_modele.py	/^    def attaqueDeTour(self, creep):$/;"	m	class:Tour
 c	interface_controleur.py	/^    c=Controleur()$/;"	v
-calculerTrajectoire	interface_modele.py	/^    def calculerTrajectoire(self, creep):$/;"	m	class:Tour
-creationAiresConstruction	interface_modele.py	/^    def creationAiresConstruction(self):$/;"	m	class:Niveau
-creationIconesTours	interface_modele.py	/^    def creationIconesTours(self):$/;"	m	class:Niveau
-creationTours	interface_modele.py	/^    def creationTours(self):$/;"	m	class:Niveau
+calcAngle	helper.py	/^    calcAngle = staticmethod(calcAngle)$/;"	v	class:Helper
+calcAngle	helper.py	/^    def calcAngle(x1,y1,x2,y2):$/;"	m	class:Helper
+calcDistance	helper.py	/^    calcDistance = staticmethod(calcDistance)$/;"	v	class:Helper
+calcDistance	helper.py	/^    def calcDistance(x1,y1,x2,y2):$/;"	m	class:Helper
+calculerAngleVersCible	interface_modele.py	/^    def calculerAngleVersCible(self, creep):$/;"	m	class:Tour
+calculerDistanceTourCible	interface_modele.py	/^    def calculerDistanceTourCible(self,creep):$/;"	m	class:Tour
+calculerPointAttaque	interface_modele.py	/^    def calculerPointAttaque(self, angle, distance, x,y):$/;"	m	class:Tour
+calculerTrajectoire	interface_modele.py	/^    def calculerTrajectoire(self, creep):$/;"	m	class:Projectile
+construireTour	interface_modele.py	/^    def construireTour(self, type, x,y): #x et y sont les coordonnées de l'aire de construction$/;"	m	class:Niveau
 creerCreep	interface_modele.py	/^    def creerCreep(self):$/;"	m	class:Vague
-deplacerProjectiles	interface_modele.py	/^    def deplacerProjectiles(self):$/;"	m	class:Projectile
+deplacerProjectile	interface_modele.py	/^    def deplacerProjectile(self, creep):$/;"	m	class:Projectile
 dessinerAires	interface_vue.py	/^    def dessinerAires(self, listAires):$/;"	m	class:Vue
 dessinerAiresConstruction	interface_controleur.py	/^    def dessinerAiresConstruction(self):$/;"	m	class:Controleur
 dessinerIconesTours	interface_controleur.py	/^    def dessinerIconesTours(self):$/;"	m	class:Controleur
 dessinerIconesTours	interface_vue.py	/^    def dessinerIconesTours(self, listIconesTours):$/;"	m	class:Vue
-dessinerTours	interface_controleur.py	/^    def dessinerTours(self):$/;"	m	class:Controleur
-dessinerTours	interface_vue.py	/^    def dessinerTours(self, listTours):$/;"	m	class:Vue
+dessinerTour	interface_vue.py	/^    def dessinerTour(self, tour):$/;"	m	class:Vue
 dessinerUneAire	interface_vue.py	/^    def dessinerUneAire(self, aire):$/;"	m	class:Vue
 dessinerUneIconeTour	interface_vue.py	/^    def dessinerUneIconeTour(self,iconeTour):$/;"	m	class:Vue
 dessinerUneTour	interface_vue.py	/^    def dessinerUneTour(self,tour):$/;"	m	class:Vue
+detecterClick	interface_vue.py	/^    def detecterClick(self):$/;"	m	class:Vue
 disposerEcran	interface_vue.py	/^    def disposerEcran(self, sentier):$/;"	m	class:Vue
 effacerAnimationPrecedente	interface_vue.py	/^    def effacerAnimationPrecedente(self):$/;"	m	class:Vue
+event_click	interface_controleur.py	/^    def event_click(self,position):$/;"	m	class:Controleur
+event_click	interface_modele.py	/^    def event_click(self,position):$/;"	m	class:Jeu
 faireAction	interface_modele.py	/^    def faireAction(self):$/;"	m	class:Jeu
 gameData	animation.py	/^class gameData():$/;"	c
 gdata	animation.py	/^    gdata = gameData()$/;"	v
+genererAiresConstruction	interface_modele.py	/^    def genererAiresConstruction(self):$/;"	m	class:Niveau
+genererIconesTours	interface_modele.py	/^    def genererIconesTours(self):$/;"	m	class:Niveau
+getAngledPoint	helper.py	/^    def getAngledPoint(angle,longueur,cx,cy):$/;"	m	class:Helper
+getAngledPoint	helper.py	/^    getAngledPoint = staticmethod(getAngledPoint)$/;"	v	class:Helper
 im	interface_controleur.py	/^import interface_modele as im$/;"	I
+isInside	interface_modele.py	/^    def isInside(self, x, y):$/;"	m	class:Cercle
+isInside	interface_modele.py	/^    def isInside(self, x, y):$/;"	m	class:Rect
 iv	interface_controleur.py	/^import interface_vue as iv$/;"	I
-siDansCercle	interface_modele.py	/^    def siDansCercle(self, pts):$/;"	m	class:Cercle
-siDansRect	interface_modele.py	/^    def siDansRect(self, rect, pts):$/;"	m	class:Rect
+nouvelleTour	interface_controleur.py	/^    def nouvelleTour(self, tour):$/;"	m	class:Controleur
+siCreepDansRangeTour	interface_modele.py	/^    def siCreepDansRangeTour(self, creep, tour):$/;"	m	class:Jeu
+soustrairePtsVieCreep	interface_modele.py	/^    def soustrairePtsVieCreep(self, projectile):$/;"	m	class:Creep
 suivreSentier	interface_modele.py	/^    def suivreSentier(self):$/;"	m	class:Creep
+transfererValeurCreep	interface_modele.py	/^    def transfererValeurCreep(self):$/;"	m	class:Creep
 update	animation.py	/^    def update(self, sprite):$/;"	m	class:gameData
 v	interface_vue.py	/^    v=Vue(None)$/;"	v
-verifierCreepDansRangeTour	interface_modele.py	/^    def verifierCreepDansRangeTour(self, creep, tour):$/;"	m	class:Jeu
+verifierAtteinteCible	interface_modele.py	/^    def verifierAtteinteCible(self, creep):$/;"	m	class:Projectile
+verifierSiCreepEstMort	interface_modele.py	/^    def verifierSiCreepEstMort(self):$/;"	m	class:Creep
