@@ -231,19 +231,14 @@ class Projectile():
         self.posX += (self.vitesse * self.prtTour.trajectoireX)
         self.posY += (self.vitesse * self.prtTour.trajectoireY)
 
-class Point():
-    def __init__(self, x, y):
-        self.x = x
-        self.y = y
-
 class Cercle():
     def __init__(self, x, y, rayon):
         self.x = x
         self.y = y
         self.r = rayon
 
-    def siDansCercle(self, pts):
-        delta = pow((pts.x - self.x), 2) + pow((pts.x - self.x), 2)
+    def siDansCercle(self, x, y):
+        delta = pow((x - self.x), 2) + pow((x - self.x), 2)
         if delta > pow(self.r, 2):
             return False
         return True
@@ -255,13 +250,12 @@ class Rect():
         self.largeur = largeur
         self.hauteur = hauteur
 
-    def siDansRect(self, rect, pts):
-        for i in range(rect.hauteur):
-            for j in range(rect.largeur):
-                if i == pts.y and j == pts.x:
-                    return True
-        return False
-
+    def siDansRect(self, x, y):
+        if x > self.x and x < self.x + self.largeur:
+            if y > self.y and y < self.y + self.hauteur:
+                return True
+        else:
+            return False
 
 if __name__ == '__main__':
     print ("Fin Modele")
