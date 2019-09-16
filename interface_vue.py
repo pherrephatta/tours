@@ -1,72 +1,96 @@
 # -*- coding: iso-8859-1 -*-
 
-from tkinter import *  # seule exception pour cette librairie on importe l'entierete
-import random
-import interface_modele as im
-
+from tkinter import *
+from test.test_importlib.namespace_pkgs.project1 import parent
 
 class Vue():
-    def __init__(self, parent):
-        self.parent=parent
-        self.root=Tk()  #fenetre principale de l'environnement graphique, objet de type top level
-        self.largeur=800
-        self.hauteur=600
-        self.elementAEffacer = []
-    # quelques widgets
-    
+    def __init__(self, controleur):
+        self.prtControleur = controleur
+        self.root = Tk()
+        self.hauteur = 600
+        self.largeur = 800
+
+        self.creepsAEffacer = []
+        self.projectilesAEffacer = []
+
+    #TODO: Placer les elements dans __init__ (faire reference au meme canevas/cadre)
     def disposerEcran(self, sentier):
-        self.cadremenu=Frame(self.root, bg="red", width=600, height=200)
-        self.cadredessin=Frame(self.root, bg="blue",width=600, height=200) #On doit maintenant les disposer (demander au gestionnaire)
-        
-        
-        self.monetiquette=Label(self.cadremenu, text="Hello world")  #1er argument en tkinter est parent dans la hierarchie
-        self.monetiquette.pack(side=LEFT)
-        #self.monetiquette.pack_forget() # enleve mais existe tjrs en memoire, le gestionnaire ne le considere plus
-        self.monentree=Entry(self.cadremenu) #champ de texte
-        self.monentree.insert(0, "Ecrivez ici")
-        self.monentree.pack(side=LEFT)
-        
-        self.monaction=Button(self.cadremenu, text="clic moi", command=self.reagit) #reagit pas de parentheses
-        self.monaction.pack(side=LEFT)
-        
-        self.canevas=Canvas(self.cadredessin,width=self.largeur, height=self.hauteur, bg="green")
-        
-        # test sentier
-        self.canevas.create_line(sentier.trace, width=sentier.largeur);
-        
-        self.canevas.pack()
-        
-        self.cadremenu.pack()
-        self.cadredessin.pack()
-    
-    def reagit(self): 
-        self.parent.creerpion()
-    
-    # copie de ma fonction originale
-    def reagit1(self): #La fonction est un objet Python. Retourne none par defaut, on ne veut pas son resultat mais son execution
-        x=random.randrange(self.largeur)
-        y=random.randrange(self.hauteur)
-        taille=5
-        self.canevas.create_rectangle(x-taille, y-taille,
-                                      x+taille, y+taille,
-                                      fill="yellow")  #donne un point, et un autre point, et trace rectangle entre les 2
-        #donnee=self.monentree.get()
-        #print(donnee)
-        print(x,y)
-        
-    def afficherpions(self,pions):  #efface tout ce que le canevas contenait
-       # self.effacerpions(self.elementAEffacer)
-        for i in pions:
-            p=self.canevas.create_rectangle(i.x-i.taille, i.y-i.taille,
-                                      i.x+i.taille, i.y+i.taille,
-                                      fill="yellow")
-            self.elementAEffacer.append(p)
-    
-    def effacerpions(self, elementAEffacer):
-        for i in self.elementAEffacer:
-            self.canevas.delete(i)
-            
+        self.cadreMenu = Frame(self.root, bg="grey",width=800, height=600)
+        self.cadreMenu.pack()
+
+        self.cadreDessin = Frame(self.root, bg="black", width=800, height=600)
+        self.cadreDessin.pack()
+
+        self.canevasDessin = Canvas(self.cadreDessin,width=self.largeur, height=self.hauteur, bg="green")
+        self.canevasDessin.create_line(sentier.trace, width=sentier.largeur, fill=sentier.couleur)
+        self.canevasDessin.pack()
+
+        self.boutonMenu=Button(self.cadreMenu,text="menu",bg="grey")
+        self.boutonMenu.pack(side=LEFT)
+
+        self.boutonQuitter=Button(self.cadreMenu,text="Quitter",command=self.root.quit,bg="grey",fg="red")
+        self.boutonQuitter.pack(side=RIGHT)
+
+    def afficherCreeps(self, vague):
+        for i in vague.listCreeps:
+            creep=self.canevasDessin.create_oval(i.positionX, i.positionY, i.positionX+10, i.positionY+10, fill="yellow")
+            self.creepsAEffacer.append(creep)
+
+    def effacerAnimationPrecedente(self):
+        for i in self.creepsAEffacer:
+            self.canevasDessin.delete(i)
+        self.creepsAEffacer.clear()
+        for j in self.projectilesAEffacer:
+            self.canevasDessin.delete(j)
+        self.projectilesAEffacer.clear()
+
+    def afficherTour(self, tour):
+        self.canevasDessin.create_rectangle(tour.posX, tour.posY, tour.posX+30, tour.posY+30, fill="white")
+
+    def afficherProjectiles(self, jeu):
+        for i in jeu.listProjectiles:
+            projectile=self.canevasDessin.create_rectangle(i.posX, i.posY, i.posX+5, i.posY+5, fill="red")
+            self.projectilesAEffacer.append(projectile)
+
+    #TODO: Pour l'instant c'est un rectangle mais on pourra facilement importer des sprites
+    def dessinerUneAire(self, aire):
+        self.canevasDessin.create_rectangle(aire.posX-aire.largeur,aire.posY-aire.hauteur,aire.posX+aire.largeur,
+                                          aire.posY+aire.hauteur,fill=aire.couleur)
+
+    #TODO: Logique?
+    #Dessine toutes les aires de construction d'un aire de jeu.
+    def dessinerAires(self, tabAires):
+        for i in tabAires:
+            self.dessinerUneAire(i)
+
+    #TODO: Pour l'instant il n'y a qu'un seul type de tour. Éventuellement chaque type de tour aura sa fonction dessiner
+    #TODO: Pour l'instan c'est un rectangle mais on pourra facilement importer des sprites
+    def dessinerUneTour(self,tour):
+        self.canevasDessin.create_rectangle(tour.posX-tour.largeur,tour.posY-tour.hauteur,tour.posX+tour.largeur,
+                                          tour.posY+tour.hauteur,fill=tour.couleur)
+
+    #Dessine toutes les tours d'un aire de jeu. Éventuellement ce sera selon le type choisi.
+    def dessinerTours(self, tabTours):
+        for i in tabTours:
+            if i.type=="Tour":
+                self.dessinerUneTour(i)
+
+    #TODO: Pour l'instant il n'y a qu'un seul type d'icone de tour. Éventuellement chaque type de tour aura sa fonction dessiner
+    #TODO: Pour l'instan c'est un rectangle mais on pourra facilement importer des sprites
+    def dessinerUneIconeTour(self,iconeTour):
+        self.canevasDessin.create_rectangle(iconeTour.posX-iconeTour.largeur,iconeTour.posY-iconeTour.hauteur,
+                                      iconeTour.posX+iconeTour.largeur, iconeTour.posY+iconeTour.hauteur,
+                                      fill=iconeTour.couleur)
+        self.dessinerUneTour(iconeTour.tour)
+
+    #Dessine toutes les icones de tour d'un aire de jeu. Éventuellement ce sera selon le type choisi.
+    def dessinerIconesTours(self, tabIconesTours):
+        for i in tabIconesTours:
+            if i.type=="Tour":
+                self.dessinerUneIconeTour(i)
+
 if __name__ == '__main__':
     v=Vue(None)
+#    v.detecterClick() TODO: Detecter un clique a l'interieur d'un triangle
     v.root.mainloop()
-    print("DANS VUE")
+    print ("Fin Vue")

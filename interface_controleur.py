@@ -1,26 +1,39 @@
 # -*- coding: iso-8859-1 -*-
-import interface_modele as im #alias !
-import interface_vue as iv #alias !
+
+import interface_modele as im
+import interface_vue as iv
 
 class Controleur():
     def __init__(self):
         self.jeu=im.Jeu(self)
         self.vue=iv.Vue(self)
-        self.jeu.creationpions(1)
-        self.vue.disposerEcran(self.jeu.sentier)
+        self.vue.disposerEcran(self.jeu.partie.niveau.sentier)
         self.animer()
-    
-    def animer(self):
-        self.vue.effacerpions(self.vue.elementAEffacer)
-        self.jeu.faireaction()
-        self.vue.afficherpions(self.jeu.pions)
-        self.vue.root.after(50,self.animer) #2 parametres : combien de temps en ms + rappel sans () car je ne veux pas l'exécuter tout de suite
+#        self.dessinerAiresConstruction()
+#        self.dessinerTours()
+#        self.dessinerIconesTours()
 
-    def creerpion(self):
-        self.jeu.creationpions(1)
+    def animer(self):
+        self.vue.effacerAnimationPrecedente()
+        self.jeu.faireAction()
+        self.vue.afficherCreeps(self.jeu.partie.niveau.vague)
+        self.vue.afficherTour(self.jeu.partie.niveau.tour)
+        self.vue.afficherProjectiles(self.jeu)
+        self.vue.root.after(50,self.animer)
+
+    #TODO: J'ai fait en sorte que dans modèle le jeu génère lui même ses parties qui elles génèrent automatiquement
+    #ses niveaux. Il faudra discuter si on veut passer par le contrôleur pour ces éléments.
+
+    def dessinerAiresConstruction(self):
+        self.vue.dessinerAires(self.jeu.partie.niveau.listAires)
+
+    def dessinerTours(self):
+        self.vue.dessinerTours(self.jeu.partie.niveau.listTours)
+
+    def dessinerIconesTours(self):
+        self.vue.dessinerIconesTours(self.jeu.partie.niveau.listIconesTours)
 
 if __name__ == '__main__':
     c=Controleur()
-    c.vue.root.mainloop()  #boucle de l'engin de jeu
-    # tout ce qui vient apres le mainloop sera execute a la fermeture de la fenetre
-    print("FIN INTERFACE")
+    c.vue.root.mainloop()
+    print ("Fin interface")
