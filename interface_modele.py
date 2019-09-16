@@ -1,7 +1,13 @@
 # -*- coding: iso-8859-1 -*-
 
 #****Temporaire: j'ai mis dans les classes seulement les éléments dont j'avais besoin. Elles sont à compléter.****
-#****TODO: remplacer tous les "tab" (ex tabTours) par "list"
+
+# Ajouts et Modifications (15/09/2019):
+# - Classes Rect, Cercle, Point
+# - Vague() -> Vague(nbCreeps)
+# - creerCreeps()
+# - Partie.niveaux = []
+# - Niveau.vagues = []
 
 class Jeu():
     def __init__(self, controleur, largeur=800, hauteur=600):
@@ -12,9 +18,9 @@ class Jeu():
         self.listProjectiles=[] #TODO: mettre a un endroit plus approprier
 
     def faireAction(self):
-        for i in self.partie.niveau.vague.listCreeps:
+        for i in self.partie.niveaux[0].vagues[0].listCreeps:
             i.suivreSentier()
-            self.verifierCreepDansRangeTour(i, self.partie.niveau.tour) #TODO: revoir comment on passe les tours en référence
+            self.verifierCreepDansRangeTour(i, self.partie.niveaux[0].tour) #TODO: revoir comment on passe les tours en référence
         for j in self.listProjectiles:
             j.deplacerProjectiles()
 
@@ -31,10 +37,10 @@ class Partie():
         self.prtJeu = jeu
         self.niveauCourant = 1
         #normalement tous ces tableaux seraient dans une base de donnée. Par manque de temps ils sont définis ici.
-        self.tabAiresN1 = ([100,100],[200,100],[300,100]) #positions des tours sur l'aire de jeu
-        self.tabToursN1 = ('Tour', 'None', 'Tour') #TODO: ce tableau sera rempli lors des phases de construction
-        self.tabIconesToursN1 = ([100,500],[200,500]) #Positions de icones de construction des tours sur l'aire de jeu
-        self.niveau = Niveau(self) #la partie génère ses niveaux
+        self.listAiresN1 = ([100,100],[200,100],[300,100]) #positions des tours sur l'aire de jeu
+        self.listToursN1 = ('Tour', 'None', 'Tour') #TODO: ce tableau sera rempli lors des phases de construction
+        self.listIconesToursN1 = ([100,500],[200,500]) #Positions de icones de construction des tours sur l'aire de jeu
+        self.niveaux = [Niveau(self)] #TODO: la partie génère ses niveaux
 
 class Niveau():
     def __init__(self, partie):
@@ -43,9 +49,9 @@ class Niveau():
         self.listTours = [] # Stock les tours construies
         self.listIconesTours = [] # Les icones pour chaque tour
         self.sentier = Sentier(self)
-        self.vague = Vague(self)
+        self.vagues = [Vague(self, 5)] #TODO: Determiner nombre de creeps, types, etc.
         self.tour = Tour(self, 300, 100) #TODO: Position temporaire, pref. une liste
-#        self.nbCreepsDansUneVague = 1 #TODO: nombre de creeps dans une vague
+#        self.nbCreepsDansUneVague = 1 #TODO: A determiner
         self.creationAiresConstruction()
         self.creationTours()
         self.creationIconesTours()
@@ -53,7 +59,7 @@ class Niveau():
         #Création des aires de construction selon le tableau défini dans la classe Partie
     def creationAiresConstruction(self):
         if self.prtPartie.niveauCourant==1: #On n'a pas besoin de créer un objet "partie" dans niveau pour accès à ces attributs
-            for x,y in self.prtPartie.tabAiresN1:
+            for x,y in self.prtPartie.listAiresN1:
                 aire=AireDeConstruction(self,x,y)
                 self.listAires.append(aire)
 
@@ -61,9 +67,9 @@ class Niveau():
     def creationTours(self):
         index=0
         if self.prtPartie.niveauCourant==1:
-            for i in self.prtPartie.tabToursN1: #
+            for i in self.prtPartie.listToursN1: #
                 if i=="Tour":  #Éventuellement il va y avoir un if par type de tour
-                    x,y=self.prtPartie.tabAiresN1[index]
+                    x,y=self.prtPartie.listAiresN1[index]
                     tour=Tour(self,x,y)
                     tour.posY=tour.posY-tour.hauteur #Pour que ce soit la base de la tour qui soit au centre de l'aire de construction
                     self.listTours.append(tour)
@@ -72,21 +78,52 @@ class Niveau():
     #Création des icones de tour selon le tableau défini dans la classe Partie
     def creationIconesTours(self):
         if self.prtPartie.niveauCourant==1:
-            for x,y in self.prtPartie.tabIconesToursN1:
+            for x,y in self.prtPartie.listIconesToursN1:
                 iconeTour=IconeTour(self,x,y)
                 self.listIconesTours.append(iconeTour)
 
+#TODO: passer un dictionaire de creeps?
 class Vague():
-    def __init__(self, niveau):
+    def __init__(self, niveau, nbCreeps):
         self.prtNiveau = niveau
         self.listCreeps = []
+        self.nbCreeps = nbCreeps
 #        self.nbCreep = self.prtNiveau.nbCreepsDansUneVague #TODO: Creeps dans une vague
         self.creerCreep()
 
     def creerCreep(self):
-        creep = Creep(self)
-        self.listCreeps.append(creep)
-        print("objet creep init : un Creep créé") #TODO: A enlever -- juste pour test
+        #TODO: ajouter differents type de creep, etc.
+        for i in range(self.nbCreeps):
+            creep = Creep(self)
+            self.listCreeps.append(creep)
+
+#TODO: generaliser la creation de sentier?
+class Sentier():
+    def __init__(self, niveau):  # parent = niveau
+        self.prtNiveau = niveau
+        self.coord0 = [0,200]
+        self.coord1 = [200,200]
+        self.coord2 = [200,400]
+        self.coord3 = [350,400]
+        self.coord4 = [350,150]
+        self.coord5 = [500, 150]
+        self.coord6 = [500, 500]
+        self.coord7 = [700, 500]
+        self.coord8 = [700, 0]
+        self.largeur = 30
+        self.couleur = "black"
+
+        self.trace = [self.coord0, self.coord1, self.coord2, self.coord3, self.coord4, self.coord5,
+                      self.coord6, self.coord7, self.coord8]
+
+class AireDeConstruction():
+    def __init__(self, parent,x,y):
+        self.parent=parent #TODO: parent -> ?
+        self.largeur=25
+        self.hauteur=5
+        self.posX=x
+        self.posY=y
+        self.couleur="brown"
 
 class Creep():
     def __init__(self, vague):
@@ -129,35 +166,6 @@ class Creep():
         elif self.positionX >= self.prtVague.prtNiveau.sentier.coord7[0]:
             self.positionY -= self.vitesse
             #print("c8")
-
-
-#TODO: generaliser la creation de sentier?
-class Sentier():
-    def __init__(self, niveau):  # parent = niveau
-        self.prtNiveau = niveau
-        self.coord0 = [0,200]
-        self.coord1 = [200,200]
-        self.coord2 = [200,400]
-        self.coord3 = [350,400]
-        self.coord4 = [350,150]
-        self.coord5 = [500, 150]
-        self.coord6 = [500, 500]
-        self.coord7 = [700, 500]
-        self.coord8 = [700, 0]
-        self.largeur = 30
-        self.couleur = "black"
-
-        self.trace = [self.coord0, self.coord1, self.coord2, self.coord3, self.coord4, self.coord5,
-                      self.coord6, self.coord7, self.coord8]
-
-class AireDeConstruction():
-    def __init__(self, parent,x,y):
-        self.parent=parent #TODO: parent -> ?
-        self.largeur=25
-        self.hauteur=5
-        self.posX=x
-        self.posY=y
-        self.couleur="brown"
 
 class Tour():
     def __init__(self, niveau,x,y):
@@ -213,15 +221,47 @@ class IconeTour():
 
 class Projectile():
     def __init__(self, tour): # parent = tour
-        self.parent=tour
-        self.posX=self.parent.posX
-        self.posY=self.parent.posY
+        self.prtTour = tour
+        self.posX=self.prtTour.posX
+        self.posY=self.prtTour.posY
         self.puissance=1
         self.vitesse = 50
 
     def deplacerProjectiles(self):
-        self.posX += (self.vitesse * self.parent.trajectoireX)
-        self.posY += (self.vitesse * self.parent.trajectoireY)
+        self.posX += (self.vitesse * self.prtTour.trajectoireX)
+        self.posY += (self.vitesse * self.prtTour.trajectoireY)
+
+class Point():
+    def __init__(self, x, y):
+        self.x = x
+        self.y = y
+
+class Cercle():
+    def __init__(self, x, y, rayon):
+        self.x = x
+        self.y = y
+        self.r = rayon
+
+    def siDansCercle(self, pts):
+        delta = pow((pts.x - self.x), 2) + pow((pts.x - self.x), 2)
+        if delta > pow(self.r, 2):
+            return False
+        return True
+
+class Rect():
+    def __init__(self, x, y, largeur, hauteur):
+        self.x = x
+        self.y = y
+        self.largeur = largeur
+        self.hauteur = hauteur
+
+    def siDansRect(self, rect, pts):
+        for i in range(rect.hauteur):
+            for j in range(rect.largeur):
+                if i == pts.y and j == pts.x:
+                    return True
+        return False
+
 
 if __name__ == '__main__':
     print ("Fin Modele")

@@ -59,8 +59,8 @@ class Vue():
 
     #TODO: Logique?
     #Dessine toutes les aires de construction d'un aire de jeu.
-    def dessinerAires(self, tabAires):
-        for i in tabAires:
+    def dessinerAires(self, listAires):
+        for i in listAires:
             self.dessinerUneAire(i)
 
     #TODO: Pour l'instant il n'y a qu'un seul type de tour. Éventuellement chaque type de tour aura sa fonction dessiner
@@ -70,8 +70,8 @@ class Vue():
                                           tour.posY+tour.hauteur,fill=tour.couleur)
 
     #Dessine toutes les tours d'un aire de jeu. Éventuellement ce sera selon le type choisi.
-    def dessinerTours(self, tabTours):
-        for i in tabTours:
+    def dessinerTours(self, listTours):
+        for i in listTours:
             if i.type=="Tour":
                 self.dessinerUneTour(i)
 
@@ -84,8 +84,8 @@ class Vue():
         self.dessinerUneTour(iconeTour.tour)
 
     #Dessine toutes les icones de tour d'un aire de jeu. Éventuellement ce sera selon le type choisi.
-    def dessinerIconesTours(self, tabIconesTours):
-        for i in tabIconesTours:
+    def dessinerIconesTours(self, listIconesTours):
+        for i in listIconesTours:
             if i.type=="Tour":
                 self.dessinerUneIconeTour(i)
 
