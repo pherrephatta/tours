@@ -19,22 +19,31 @@ class Jeu():
         self.partie = Partie(self) # le jeu génère ses parties
         self.listProjectiles=[] #TODO: mettre a un endroit plus approprier (Tour?)
         self.typeAconstruire = "None" # tour a construire, selectionne par le joueur
+    
 
+    def bougerCreep(self, creep):
+        creep.suivreSentier()
+        for j in self.partie.niveau.listTours:
+                    self.siCreepDansRangeTour(creep, j) #voir comment on passe les tours en référence, ici c'est test
+    
+    def bougerProjectile(self, projectile):
+        projectile.deplacerProjectile(projectile.creep)
+        if (projectile.verifierAtteinteCible(projectile.creep)):
+            self.listProjectiles.remove(projectile)
+            projectile.creep.soustrairePtsVieCreep(projectile)
+            if (projectile.creep.verifierSiCreepEstMort()):
+                self.partie.niveau.vagues[0].listCreeps.remove(projectile.creep)
+                projectile.creep.transfererValeurCreep()
+                    
     def faireAction(self):
         # Faire bouger les creeps et attaquer avec tours
         for i in self.partie.niveau.vagues[0].listCreeps:
-            i.suivreSentier()
-            for j in self.partie.niveau.listTours:
-                self.siCreepDansRangeTour(i, j) #voir comment on passe les tours en référence, ici c'est test
+            self.prtControleur.syncMoveCreep(i)
         # Animer projectiles et effet sur les creeps
         for j in self.listProjectiles:
-            j.deplacerProjectile(j.creep)
-            if (j.verifierAtteinteCible(j.creep)):
-                self.listProjectiles.remove(j)
-                j.creep.soustrairePtsVieCreep(j)
-                if (j.creep.verifierSiCreepEstMort()):
-                    self.partie.niveau.vagues[0].listCreeps.remove(j.creep)
-                    j.creep.transfererValeurCreep()
+            self.prtControleur.syncMoveProjectile(j)
+            
+            
 
     def siCreepDansRangeTour(self, creep, tour):
         if abs(tour.posX - creep.positionX) < tour.range:
@@ -63,7 +72,7 @@ class Jeu():
                            print("emplacement non libre")
                            emplacementLibre=False
                     if(emplacementLibre==True):
-                        self.partie.niveau.construireTour(self.typeAconstruire, i.posX, i.posY)
+                        self.partie.niveau.construireTour(self.typeAconstruire, i.posX, i.posY) #
                         self.typeAconstruire="None"
 
 class Timer():
@@ -84,7 +93,6 @@ class Partie():
         self.niveauCourant = 1
         #normalement tous ces tableaux seraient dans une base de donnée. Par manque de temps ils sont définis ici.
         self.listAiresN1 = ([100,100],[200,100],[300,100],[400,250]) #positions des tours sur l'aire de jeu
-#        self.listToursN1 = ('Tour', 'None', 'Tour') # rempli lors des phases de construction (marche sans)
         self.listIconesToursN1 = ([100,500],[200,500]) #Positions de icones de construction des tours sur l'aire de jeu
         self.niveau = Niveau(self) #TODO: la partie génère DES niveaux?
         self.argentJoueur = 500 #valeur à déterminer
@@ -174,7 +182,8 @@ class Creep():
         self.positionX = self.prtVague.prtNiveau.sentier.coord0[0]
         self.positionY = self.prtVague.prtNiveau.sentier.coord0[1]
         self.ptsVie = 3 #TODO: cette variable devra être passée en argument par la vague
-        self.vitesse = 5 #TODO: cette variable devra être passée en argument par la vague
+        self.pas = 2 #TODO: cette variable devra être passée en argument par la vague
+        self.vitesse=50
         self.valeur = 10 #TODO: cette variable devra être passée en argument par la vague
         self.puissanceDommage = 1 #TODO: cette variable devra être passée en argument par la vague
 
@@ -185,28 +194,28 @@ class Creep():
 
     def suivreSentier(self):
         if self.positionX <  self.prtVague.prtNiveau.sentier.coord1[0]:
-            self.positionX += self.vitesse
+            self.positionX += self.pas
             #print("c1")
         elif self.positionY < self.prtVague.prtNiveau.sentier.coord2[1] and self.positionX < self.prtVague.prtNiveau.sentier.coord4[0]:
-            self.positionY += self.vitesse
+            self.positionY += self.pas
             #print("c2")
         elif self.positionX < self.prtVague.prtNiveau.sentier.coord3[0]:
-            self.positionX += self.vitesse
+            self.positionX += self.pas
             #print("c3")
         elif self.positionY > self.prtVague.prtNiveau.sentier.coord4[1] and self.positionX > self.prtVague.prtNiveau.sentier.coord1[0] and self.positionX <= self.prtVague.prtNiveau.sentier.coord5[0]:
-            self.positionY -= self.vitesse
+            self.positionY -= self.pas
             #print("c4")
         elif self.positionX < self.prtVague.prtNiveau.sentier.coord5[0]:
-            self.positionX += self.vitesse
+            self.positionX += self.pas
             #print("c5")
         elif self.positionY < self.prtVague.prtNiveau.sentier.coord6[1] and self.positionX > self.prtVague.prtNiveau.sentier.coord5[0] and self.positionX < self.prtVague.prtNiveau.sentier.coord7[0]:
-            self.positionY += self.vitesse
+            self.positionY += self.pas
             #print("c6")
         elif self.positionX < self.prtVague.prtNiveau.sentier.coord7[0]:
-            self.positionX += self.vitesse
+            self.positionX += self.pas
             #print("c7")
         elif self.positionX >= self.prtVague.prtNiveau.sentier.coord7[0]:
-            self.positionY -= self.vitesse
+            self.positionY -= self.pas
             #print("c8")
 
     def soustrairePtsVieCreep(self, projectile):
@@ -279,20 +288,21 @@ class IconeTour():
         self.rect = Rect(self.posX, self.posY, self.largeur,self.hauteur)
 
 class Projectile():
-    def __init__(self, tour, creep): # parent = tour
+    def __init__(self, tour, creep):
         self.prtTour = tour
         self.posX=self.prtTour.posX
         self.posY=self.prtTour.posY
         self.puissance = 1
-        self.vitesse = 50
+        self.pas = 10
+        self.vitesse = 1 
         self.creep = creep
         self.trajectoireX = 0
         self.trajectoireY = 0
         self.calculerTrajectoire(self.creep)
 
     def deplacerProjectile(self, creep):
-        self.posX += (self.vitesse * self.trajectoireX)
-        self.posY += (self.vitesse * self.trajectoireY)
+        self.posX += (self.pas * self.trajectoireX)
+        self.posY += (self.pas * self.trajectoireY)
 
     def verifierAtteinteCible(self, creep):
         buffer = 50 #eventuellement sera hit box du creep
@@ -338,8 +348,8 @@ class Rect():
         self.largeur = largeur
         self.hauteur = hauteur
 
-    def isInside(self, x, y):
-        if x > self.x and x < self.x + self.largeur and y > self.y and y < self.y + self.hauteur:
+    def isInside(self, x,y):
+        if (x > self.x-self.largeur) and (x< self.x+self.largeur) and (y > self.y-self.hauteur) and (y < self.y + self.hauteur):
             return True
         else:
             return False

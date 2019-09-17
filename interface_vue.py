@@ -9,9 +9,9 @@ class Vue():
         self.root = Tk()
         self.hauteur = 600
         self.largeur = 800
-
         self.creepsAEffacer = []
         self.projectilesAEffacer = []
+
 
     #TODO: Placer les elements dans __init__ (faire reference au meme canevas/cadre)
     def disposerEcran(self, sentier):
