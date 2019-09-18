@@ -5,26 +5,33 @@ import interface_vue as iv
 
 class Controleur():
     def __init__(self):
-        self.jeu = im.Jeu(self)
         self.vue = iv.Vue(self)
+        self.jeu = im.Jeu(self)
         self.vue.disposerEcran(self.jeu.partie.niveau.sentier)
         self.animer()
         self.dessinerAiresConstruction()
         self.dessinerIconesTours()
         self.vue.detecterClick()
-  
+        self.syncCreerCreep()
+
     def animer(self):
         self.vue.effacerAnimationPrecedente()
         self.jeu.faireAction()
         self.vue.afficherCreeps(self.jeu.partie.niveau.vague)
         self.vue.afficherProjectiles(self.jeu) #TODO: projectiles dans jeu
-        self.vue.root.after(1,self.animer)
+        self.vue.root.after(50, self.animer)
 
     def syncMoveCreep(self, creep):
-        self.vue.root.after(creep.vitesse, self.jeu.bougerCreep(creep))
+        self.vue.root.after(creep.vitesse, self.jeu.bougerCreep, creep)
         
     def syncMoveProjectile(self, projectile):
-        self.vue.root.after(projectile.vitesse, self.jeu.bougerProjectile(projectile))
+        self.vue.root.after(projectile.vitesse, self.jeu.bougerProjectile, projectile)
+
+    def syncCreerCreep(self):
+        if self.jeu.partie.niveau.vague.nbCreepsActif < self.jeu.partie.niveau.vague.nbCreepsTotal:
+            self.jeu.partie.niveau.vague.listCreeps.append(im.Creep(self.jeu.partie.niveau.vague))
+            self.jeu.partie.niveau.vague.nbCreepsActif += 1
+            self.vue.root.after(1000, self.syncCreerCreep)
 
     #Lorsque la vue détecte un "click gauche de la souris" elle appelle cette fonction afin que le contrôleur
     #transmette l'événement au modèle. position = position du curseur de la souris lors du click.

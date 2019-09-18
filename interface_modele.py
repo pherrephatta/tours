@@ -9,6 +9,7 @@ import helper
 # Interaction projectile et creep
 #TODO: Trajectoire de projectile
 #TODO: Delai de creeps est pas encore 100%
+#TODO: Projectiles influencent la generation de creep
 
 class Jeu():
     def __init__(self, controleur, largeur=800, hauteur=600):
@@ -26,6 +27,8 @@ class Jeu():
         # Animer projectiles et effet sur les creeps
         for j in self.listProjectiles:
             self.prtControleur.syncMoveProjectile(j)
+        # Creer un nouveau creep
+            self.prtControleur.syncCreerCreep()
 
     def bougerCreep(self, creep):
         creep.suivreSentier()
@@ -121,10 +124,6 @@ class Vague():
         self.listCreeps = []
         self.nbCreepsTotal = nbCreeps
         self.nbCreepsActif = 0
-        self.creerCreep()
-
-    def creerCreep(self):
-        self.listCreeps.append(Creep(self))
 
 #TODO: generaliser la creation de sentier?
 class Sentier():
@@ -132,6 +131,7 @@ class Sentier():
         self.prtNiveau = niveau
         self.largeur = 30
         self.couleur = "black"
+        #TODO: temp, essais vecteurs
         self.chemin = [[0,200],[200,200],[200,400],[350,400],[350,400],[350,150],[500,150],[500,500],[700,500],[700,0]]
 
         self.prtNiveau = niveau
@@ -146,6 +146,7 @@ class Sentier():
         self.coord8 = [700, 0]
         self.largeur = 30
         self.couleur = "black"
+
 #        self.trace = [self.coord0, self.coord1, self.coord2, self.coord3, self.coord4, self.coord5,
 #                      self.coord6, self.coord7, self.coord8]
 
@@ -265,6 +266,10 @@ class Tour():
         print("Projectile créé")
         self.prtNiveau.prtPartie.prtJeu.listProjectiles.append(projectile)
 
+    def calculerDistanceTourCible(self, creep):
+        distance = helper.Helper.calcDistance(self.posX, self.posY, creep.positionX, creep.positionY)
+        return distance
+
 class IconeTour():
     def __init__(self, niveau, x, y):
         self.prtNiveau = niveau
@@ -288,7 +293,7 @@ class Projectile():
         self.posY = self.prtTour.posY
         self.trajectoireX = 0
         self.trajectoireY = 0
-        self.vitesse = 1        
+        self.vitesse = 50        
         self.puissance = 1
         self.pas = 10
 
@@ -307,6 +312,28 @@ class Projectile():
     def calculerDistanceCible(self):
         distance = helper.Helper.calcDistance(self.posX, self.posY, self.cible.positionX, self.cible.positionY)
         return distance
+
+    def calculerTrajectoire2(self, creep):
+            cible=[creep.positionX, creep.positionY]
+            distance = self.prtTour.calculerDistanceTourCible(creep)
+            incrementX = abs(self.posX - creep.positionX)/distance
+            incrementY = abs(self.posY - creep.positionY)/distance
+            if cible[0] < self.posX:
+                    self.trajectoireX = -1
+            elif cible[0] > self.posX:
+                    self.trajectoireX = +1
+            else:
+                    trajectoireX = 0
+            if cible[1] < self.posY:
+                    self.trajectoireY = -1
+            elif cible[1] > self.posY:
+                    self.trajectoireY = +1
+            else:
+                    self.trajectoireY = 0
+            
+            self.trajectoireX *= incrementX
+            self.trajectoireY *= incrementY
+
 
     def calculerTrajectoire(self):
         distance = self.calculerDistanceCible()
