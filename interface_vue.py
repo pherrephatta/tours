@@ -12,7 +12,6 @@ class Vue():
         self.creepsAEffacer = []
         self.projectilesAEffacer = []
 
-
     #TODO: Placer les elements dans __init__ (faire reference au meme canevas/cadre)
     def disposerEcran(self, sentier):
         self.cadreMenu = Frame(self.root, bg="grey",width=800, height=600)
@@ -22,7 +21,7 @@ class Vue():
         self.cadreDessin.pack()
 
         self.canevasDessin = Canvas(self.cadreDessin,width=self.largeur, height=self.hauteur, bg="green")
-        self.canevasDessin.create_line(sentier.trace, width=sentier.largeur, fill=sentier.couleur)
+        self.canevasDessin.create_line(sentier.chemin, width=sentier.largeur, fill=sentier.couleur)
         self.canevasDessin.pack()
 
         self.boutonMenu=Button(self.cadreMenu,text="menu",bg="grey")

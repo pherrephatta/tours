@@ -16,7 +16,7 @@ class Controleur():
     def animer(self):
         self.vue.effacerAnimationPrecedente()
         self.jeu.faireAction()
-        self.vue.afficherCreeps(self.jeu.partie.niveau.vagues[0])
+        self.vue.afficherCreeps(self.jeu.partie.niveau.vague)
         self.vue.afficherProjectiles(self.jeu) #TODO: projectiles dans jeu
         self.vue.root.after(1,self.animer)
 
