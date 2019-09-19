@@ -12,7 +12,6 @@ class Controleur():
         self.dessinerAiresConstruction()
         self.dessinerIconesTours()
         self.vue.detecterClick()
-        self.syncCreerCreep()
 
     def animer(self):
         self.vue.effacerAnimationPrecedente()

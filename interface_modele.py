@@ -7,9 +7,8 @@ import helper
 # Creep.hitBox
 # Creep.largeur
 # Interaction projectile et creep
-#TODO: Trajectoire de projectile
-#TODO: Delai de creeps est pas encore 100%
-#TODO: Projectiles influencent la generation de creep
+#TODO: changer % de 25 de creation de projectile pour un after()
+#TODO: Individualiser l'attaque des tours
 
 class Jeu():
     def __init__(self, controleur, largeur=800, hauteur=600):
@@ -27,8 +26,9 @@ class Jeu():
         # Animer projectiles et effet sur les creeps
         for j in self.listProjectiles:
             self.prtControleur.syncMoveProjectile(j)
-        # Creer un nouveau creep
+        if self.partie.niveau.vague.vagueCree == False:
             self.prtControleur.syncCreerCreep()
+            self.partie.niveau.vague.vagueCree = True
 
     def bougerCreep(self, creep):
         creep.suivreSentier()
@@ -91,7 +91,7 @@ class Niveau():
         self.listTours = [] # Stock les tours construies
         self.listIconesTours = [] # Les icones pour chaque tour
         self.sentier = Sentier(self)
-        self.vague = Vague(self, 5) #TODO: Determiner nombre de creeps, types, etc.
+        self.vague = Vague(self, 1) #TODO: Determiner nombre de creeps, types, etc.
         self.genererAiresConstruction()
         self.genererIconesTours()
 
@@ -124,6 +124,7 @@ class Vague():
         self.listCreeps = []
         self.nbCreepsTotal = nbCreeps
         self.nbCreepsActif = 0
+        self.vagueCree = False
 
 #TODO: generaliser la creation de sentier?
 class Sentier():
@@ -131,24 +132,8 @@ class Sentier():
         self.prtNiveau = niveau
         self.largeur = 30
         self.couleur = "black"
-        #TODO: temp, essais vecteurs
         self.chemin = [[0,200],[200,200],[200,400],[350,400],[350,400],[350,150],[500,150],[500,500],[700,500],[700,0]]
-
-        self.prtNiveau = niveau
-        self.coord0 = [0,200]
-        self.coord1 = [200,200]
-        self.coord2 = [200,400]
-        self.coord3 = [350,400]
-        self.coord4 = [350,150]
-        self.coord5 = [500, 150]
-        self.coord6 = [500, 500]
-        self.coord7 = [700, 500]
-        self.coord8 = [700, 0]
-        self.largeur = 30
-        self.couleur = "black"
-
-#        self.trace = [self.coord0, self.coord1, self.coord2, self.coord3, self.coord4, self.coord5,
-#                      self.coord6, self.coord7, self.coord8]
+#        self.chemin = [[700,0],[700,500],[500,500],[500,150],[350,150],[350,400],[200,400],[200,200],[0,200]] # meme chemin mais inverse
 
 class AireDeConstruction():
     def __init__(self, parent,x,y):
@@ -163,12 +148,12 @@ class AireDeConstruction():
 class Creep():
     def __init__(self, vague):
         self.prtVague = vague
-        self.chIndexFin = [1,1]
+        self.chIndex = 0
         self.chVelosite = [0,0]
         self.positionX = self.prtVague.prtNiveau.sentier.chemin[0][0]
         self.positionY = self.prtVague.prtNiveau.sentier.chemin[0][1]
         self.ptsVie = 3 #TODO: cette variable devra être passée en argument par la vague
-        self.pas = 2 #TODO: cette variable devra être passée en argument par la vague
+        self.pas = 4 #TODO: cette variable devra être passée en argument par la vague
         self.vitesse = 50
         self.valeur = 10 #TODO: cette variable devra être passée en argument par la vague
         self.puissanceDommage = 1 #TODO: cette variable devra être passée en argument par la vague
@@ -176,68 +161,63 @@ class Creep():
         self.hauteur = 10
         self.hitBox = Rect(self.positionX - self.largeur / 2, self.positionY + self.largeur / 2, self.largeur, self.hauteur) #TODO: largeur change avec le type?
 
+    def suivreSentier(self):
+        self.positionX += self.chVelosite[0]
+        self.positionY += self.chVelosite[1]
+        self.hitBox = Rect(self.positionX - self.largeur / 2, self.positionY - self.hauteur / 2, self.largeur, self.hauteur)
+        self.definirVecteur()
+
     def definirVecteur(self):
         # definit position X
         # verifie si le creep a atteint la fin
-        if self.chIndexFin[0] < len(self.prtVague.prtNiveau.sentier.chemin):
-            destinationX = self.prtVague.prtNiveau.sentier.chemin[self.chIndexFin[0] + 1][0]
-            # verifie si le creep va a gauche ou a droite
-            if self.positionX > destinationX:
-                # si gauche
-                self.chVelosite[0] = - self.pas
-                if self.positionX < destinationX:
-                    self.chIndexFin[0] += 1
-            elif self.positionX < destinationX:
-                # si droite
-                self.chVelosite[0] = self.pas
-                if self.positionX > destinationX:
-                    self.chIndexFin[0] += 1
+        destinationX = self.prtVague.prtNiveau.sentier.chemin[self.chIndex + 1][0]
+        destinationY = self.prtVague.prtNiveau.sentier.chemin[self.chIndex + 1][1]
+        finX = False
+        finY = False
         
-        if self.chIndexFin[1] < len(self.prtVague.prtNiveau.sentier.chemin):
-            destinationY = self.prtVague.prtNiveau.sentier.chemin[self.chIndexFin[1] + 1][1]
-            if self.positionY > destinationY:
-                # si haut
-                self.chVelosite[1] = - self.pas
-                if self.positionY < destinationY:
-                    self.chIndexFin[1] += 1
-            elif self.positionY < destinationY:
-                # si bas
+        # Creep va vers la droite 
+        if self.positionX < destinationX:
+            print("droite")
+            if self.positionX + self.pas >= destinationX:
+                self.chVelosite[0] = destinationX - self.positionX
+            else:
+                self.chVelosite[0] = self.pas
+        # Creep va vers la gauche 
+        elif self.positionX > destinationX:
+            print("gauche")
+            if self.positionX - self.pas <= destinationX:
+                self.chVelosite[0] = destinationX - self.positionX
+            else:
+                self.chVelosite[0] = -self.pas
+        # Creep est a la fin du Noeud
+        else:
+            finX = True
+            self.chVelosite[0] = 0
+
+        # Creep va vers le bas
+        if self.positionY < destinationY:
+            print("bas")
+            if self.positionY + self.pas >= destinationY:
+                self.chVelosite[1] = destinationY - self.positionY
+            else:
                 self.chVelosite[1] = self.pas
-                if self.positionY > destinationY:
-                    self.chIndexFin[1] += 1
-
-        print(str(destinationX) + " " + str(destinationY))
-        print(str(self.positionX) + " " + str(self.positionY))
-
-    def suivreSentier(self):
-        #TODO: Une idee...
-#        self.positionX += self.chVelosite[0]
-#        self.positionY += self.chVelosite[1]
-        if self.positionX <  self.prtVague.prtNiveau.sentier.coord1[0]:
-            self.positionX += self.pas
-            #print("c1")
-        elif self.positionY < self.prtVague.prtNiveau.sentier.coord2[1] and self.positionX < self.prtVague.prtNiveau.sentier.coord4[0]:
-            self.positionY += self.pas
-            #print("c2")
-        elif self.positionX < self.prtVague.prtNiveau.sentier.coord3[0]:
-            self.positionX += self.pas
-            #print("c3")
-        elif self.positionY > self.prtVague.prtNiveau.sentier.coord4[1] and self.positionX > self.prtVague.prtNiveau.sentier.coord1[0] and self.positionX <= self.prtVague.prtNiveau.sentier.coord5[0]:
-            self.positionY -= self.pas
-            #print("c4")
-        elif self.positionX < self.prtVague.prtNiveau.sentier.coord5[0]:
-            self.positionX += self.pas
-            #print("c5")
-        elif self.positionY < self.prtVague.prtNiveau.sentier.coord6[1] and self.positionX > self.prtVague.prtNiveau.sentier.coord5[0] and self.positionX < self.prtVague.prtNiveau.sentier.coord7[0]:
-            self.positionY += self.pas
-            #print("c6")
-        elif self.positionX < self.prtVague.prtNiveau.sentier.coord7[0]:
-            self.positionX += self.pas
-            #print("c7")
-        elif self.positionX >= self.prtVague.prtNiveau.sentier.coord7[0]:
-            self.positionY -= self.pas
-            #print("c8")
-        self.hitBox = Rect(self.positionX - self.largeur / 2, self.positionY - self.hauteur / 2, self.largeur, self.hauteur)
+        # Creep va vers le haut
+        elif self.positionY > destinationY:
+            print("haut")
+            if self.positionY - self.pas <= destinationY:
+                self.chVelosite[1] = destinationY - self.positionY
+            else:
+                self.chVelosite[1] = -self.pas
+        # Creep est a la fin du Noeud
+        else:
+            finY = True
+            self.chVelosite[1] = 0
+        # Changer le noeud
+        if finX == True and finY == True:
+            if self.chIndex < len(self.prtVague.prtNiveau.sentier.chemin):
+                   self.chIndex += 1
+                   finX = False
+                   finY = False
 
     def soustrairePtsVieCreep(self, projectile):
         self.ptsVie -= projectile.puissance
@@ -333,7 +313,6 @@ class Projectile():
             
             self.trajectoireX *= incrementX
             self.trajectoireY *= incrementY
-
 
     def calculerTrajectoire(self):
         distance = self.calculerDistanceCible()
