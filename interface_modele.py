@@ -14,8 +14,6 @@ class Jeu():
         self.listProjectiles=[] #TODO: mettre a un endroit plus approprier (Tour?)
         self.typeAconstruire = "None" # tour a construire, selectionne par le joueur
 
-    #TODO: si vague est fini, remettre vague.vagueCree a False
-    # Creer aussi une variable "pret" pour l'usager?
     def faireAction(self):
         # Faire bouger les creeps et attaquer avec tours
         for i in self.partie.niveau.vague.listCreeps:
@@ -23,6 +21,8 @@ class Jeu():
         # Animer projectiles et effet sur les creeps
         for j in self.listProjectiles:
             self.prtControleur.syncMoveProjectile(j)
+        #TODO: si vague est fini, remettre vague.vagueCree a False
+        # Creer aussi une variable "pret" pour l'usager?
         if self.partie.niveau.vague.vagueCree == False:
             self.prtControleur.syncCreerCreep()
             self.partie.niveau.vague.vagueCree = True
@@ -33,8 +33,7 @@ class Jeu():
             creep.enleverPtsVieAuJoueur()
             self.partie.niveau.vague.listCreeps.remove(creep)
         creep.suivreSentier()
-        for j in self.partie.niveau.listTours:
-            self.siCreepDansRangeTour(creep, j) #voir comment on passe les tours en référence, ici c'est test
+        self.siCreepDansRangeTour(creep) #voir comment on passe les tours en référence, ici c'est test
     
     def bougerProjectile(self, projectile):
         projectile.deplacerProjectile()
@@ -44,13 +43,22 @@ class Jeu():
             if (projectile.cible.verifierSiCreepEstMort()):
                 self.partie.niveau.vague.listCreeps.remove(projectile.cible)
                 projectile.cible.transfererValeurCreep()
+   
+    #TODO: Associe un creep a chacune des tours (si)
+    def siCreepDansRangeTour(self, creep):
+        for i in self.partie.niveau.listTours:
+            if i.cible == None:
+                i.siCreepDansRange(creep)
+            else:
+                #TODO: after pour attaquer!! et non dans cette boucle
+                i.attaqueDeTour()
 
-    def siCreepDansRangeTour(self, creep, tour):
-        if abs(tour.posX - creep.positionX) < tour.range:
-            if abs(tour.posY - creep.positionY) < tour.range:
-                #TODO: discuter frequence de creation des projectiles (timer?)
-                if (creep.positionX % tour.freqAttaque) == 0 and (creep.positionY % tour.freqAttaque == 0):
-                    tour.attaqueDeTour(creep)
+#    def siCreepDansRangeTour(self, creep, tour):
+#        if abs(tour.posX - creep.positionX) < tour.range:
+#            if abs(tour.posY - creep.positionY) < tour.range:
+#                #TODO: discuter frequence de creation des projectiles (timer?)
+#                if (creep.positionX % tour.freqAttaque) == 0 and (creep.positionY % tour.freqAttaque == 0):
+#                    tour.attaqueDeTour(creep)
 
     # Fonction appelée par le contrôleur lorsque la vue détecte un click gauche de la souris.
     # position = position du curseur de la souris lors du click.
@@ -263,12 +271,16 @@ class Tour():
         self.type = "Tour" #TODO: plusieurs types de tour seront implemantes
         self.range = 200
         self.freqAttaque = 25
+        self.cible = None
 #        self.cibleChoisie = False #TODO: test?
 
-    def attaqueDeTour(self, creep):
-        projectile = Projectile(self, creep)
-        print("Projectile créé")
-        self.prtNiveau.prtPartie.prtJeu.listProjectiles.append(projectile)
+    def siCreepDansRange(self, creep):
+        if abs(self.posX - creep.positionX) < self.range:
+            if abs(self.posY - creep.positionY) < self.range:
+                self.cible = creep
+
+    def attaqueDeTour(self):
+        self.prtNiveau.prtPartie.prtJeu.listProjectiles.append(Projectile(self))
 
     def calculerDistanceTourCible(self, creep):
         distance = helper.Helper.calcDistance(self.posX, self.posY, creep.positionX, creep.positionY)
@@ -323,9 +335,8 @@ class IconeTour():
             self.tour=Tour_Goo(self,self.posX,self.posY)
 
 class Projectile():
-    def __init__(self, tour, creep):
+    def __init__(self, tour):
         self.prtTour = tour
-        self.cible = creep
         self.posX = self.prtTour.posX
         self.posY = self.prtTour.posY
         self.trajectoireX = 0
@@ -340,52 +351,52 @@ class Projectile():
         self.posY += (self.pas * self.trajectoireY)
 
     def verifierAtteinteCible(self):
-        if self.cible.hitBox.isInside(self.posX, self.posY):
+        if self.prtTour.cible.hitBox.isInside(self.posX, self.posY):
             print("cible touchée! ")
             return True
         else:
             return False
 
     def calculerDistanceCible(self):
-        distance = helper.Helper.calcDistance(self.posX, self.posY, self.cible.positionX, self.cible.positionY)
+        distance = helper.Helper.calcDistance(self.posX, self.posY, self.prtTour.cible.positionX, self.prtTour.cible.positionY)
         return distance
 
-    def calculerTrajectoire2(self, creep):
-            cible=[creep.positionX, creep.positionY]
-            distance = self.prtTour.calculerDistanceTourCible(creep)
-            incrementX = abs(self.posX - creep.positionX)/distance
-            incrementY = abs(self.posY - creep.positionY)/distance
-            if cible[0] < self.posX:
-                    self.trajectoireX = -1
-            elif cible[0] > self.posX:
-                    self.trajectoireX = +1
-            else:
-                    trajectoireX = 0
-            if cible[1] < self.posY:
-                    self.trajectoireY = -1
-            elif cible[1] > self.posY:
-                    self.trajectoireY = +1
-            else:
-                    self.trajectoireY = 0
-            
-            self.trajectoireX *= incrementX
-            self.trajectoireY *= incrementY
+#    def calculerTrajectoire2(self, creep):
+#            cible=[creep.positionX, creep.positionY]
+#            distance = self.prtTour.calculerDistanceTourCible(creep)
+#            incrementX = abs(self.posX - creep.positionX)/distance
+#            incrementY = abs(self.posY - creep.positionY)/distance
+#            if cible[0] < self.posX:
+#                    self.trajectoireX = -1
+#            elif cible[0] > self.posX:
+#                    self.trajectoireX = +1
+#            else:
+#                    trajectoireX = 0
+#            if cible[1] < self.posY:
+#                    self.trajectoireY = -1
+#            elif cible[1] > self.posY:
+#                    self.trajectoireY = +1
+#            else:
+#                    self.trajectoireY = 0
+#            
+#            self.trajectoireX *= incrementX
+#            self.trajectoireY *= incrementY
 
     def calculerTrajectoire(self):
         distance = self.calculerDistanceCible()
-        deltaX = abs(self.cible.positionX + self.cible.pas - self.posX) / distance
-        deltaY = abs(self.cible.positionY + self.cible.pas - self.posY) / distance
+        deltaX = abs(self.prtTour.cible.positionX + self.prtTour.cible.pas - self.posX) / distance
+        deltaY = abs(self.prtTour.cible.positionY + self.prtTour.cible.pas - self.posY) / distance
  
-        if self.cible.positionX < self.posX:
+        if self.prtTour.cible.positionX < self.posX:
             self.trajectoireX = (-1 * deltaX) 
-        elif self.cible.positionX > self.posX:
+        elif self.prtTour.cible.positionX > self.posX:
             self.trajectoireX = (+1 * deltaX) 
         else:
             self.trajectoireX = 0
  
-        if self.cible.positionY < self.posY:
+        if self.prtTour.cible.positionY < self.posY:
             self.trajectoireY = (-1 * deltaY) 
-        elif self.cible.positionY > self.posY:
+        elif self.prtTour.cible.positionY > self.posY:
             self.trajectoireY = (+1 * deltaY) 
         else:
             self.trajectoireY = 0
