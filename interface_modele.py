@@ -2,11 +2,6 @@
 
 import helper
 
-# Modifications (17/09/2019):
-# Projectile.verifierAtteinteCible()
-# Creep.hitBox
-# Creep.largeur
-# Interaction projectile et creep
 #TODO: changer % de 25 de creation de projectile pour un after()
 #TODO: Individualiser l'attaque des tours
 
@@ -19,6 +14,8 @@ class Jeu():
         self.listProjectiles=[] #TODO: mettre a un endroit plus approprier (Tour?)
         self.typeAconstruire = "None" # tour a construire, selectionne par le joueur
 
+    #TODO: si vague est fini, remettre vague.vagueCree a False
+    # Creer aussi une variable "pret" pour l'usager?
     def faireAction(self):
         # Faire bouger les creeps et attaquer avec tours
         for i in self.partie.niveau.vague.listCreeps:
@@ -31,6 +28,10 @@ class Jeu():
             self.partie.niveau.vague.vagueCree = True
 
     def bougerCreep(self, creep):
+        if creep.verifierFinSentier() == True:
+            print("Au secours!") #pour test
+            creep.enleverPtsVieAuJoueur()
+            self.partie.niveau.vague.listCreeps.remove(creep)
         creep.suivreSentier()
         for j in self.partie.niveau.listTours:
             self.siCreepDansRangeTour(creep, j) #voir comment on passe les tours en référence, ici c'est test
@@ -80,9 +81,15 @@ class Partie():
         self.niveauCourant = 1
         #normalement tous ces tableaux seraient dans une base de donnée. Par manque de temps ils sont définis ici.
         self.listAiresN1 = ([100,100],[200,100],[300,100],[400,250],[60,280]) #positions des tours sur l'aire de jeu
-        self.listIconesToursN1 = ([100,500],[200,500]) #Positions de icones de construction des tours sur l'aire de jeu
+        self.listIconesToursN1 = ([40,490],[100,490],[40,560],[100,560]) #Positions de icones de construction des tours sur l'aire de jeu
+        self.listTypeIconeN1 = ("TourRoche","TourFeu","TourCanon","TourGoo")
         self.niveau = Niveau(self) #TODO: la partie génère DES niveaux?
         self.argentJoueur = 500 #valeur à déterminer
+        self.ptsVieJoueur = 2
+
+    def verifierGameOver(self):
+        if self.ptsVieJoueur <= 0:
+            return True
 
 class Niveau():
     def __init__(self, partie):
@@ -91,18 +98,26 @@ class Niveau():
         self.listTours = [] # Stock les tours construies
         self.listIconesTours = [] # Les icones pour chaque tour
         self.sentier = Sentier(self)
-        self.vague = Vague(self, 1) #TODO: Determiner nombre de creeps, types, etc.
+        self.vague = Vague(self, 5) #TODO: Determiner nombre de creeps, types, etc.
         self.genererAiresConstruction()
         self.genererIconesTours()
+        self.interfaceJeu = Interface_jeu()
 
     #Création d'une tour
     def construireTour(self, type, x,y): #x et y sont les coordonnées de l'aire de construction
-        if (type=="Tour"):
-            tour=Tour(self,x,y)
-            tour.posY=tour.posY-tour.hauteur#On ne veut pas que le centre de la tour soit au centre de l'aire de construction. y-tour.hauteur -> pour que ce soit la base de la tour qui est sur l'aire.
-            self.listTours.append(tour)
-            self.prtPartie.prtJeu.prtControleur.nouvelleTour(tour)
-
+        if (type=="TourRoche"):
+            tour=Tour_Roche(self,x,y)
+        elif (type=="TourFeu"):
+            tour=Tour_Feu(self,x,y)
+        elif (type=="TourCanon"):
+            tour=Tour_Canon(self,x,y)
+        elif (type=="TourGoo"):
+            tour=Tour_Goo(self,x,y)
+            
+        tour.posY = tour.posY-tour.hauteur#On ne veut pas que le centre de la tour soit au centre de l'aire de construction. y-tour.hauteur -> pour que ce soit la base de la tour qui est sur l'aire.
+        self.listTours.append(tour)
+        self.prtPartie.prtJeu.prtControleur.nouvelleTour(tour)
+        
     #Création des aires de construction selon le tableau défini dans la classe Partie
     def genererAiresConstruction(self):
         if self.prtPartie.niveauCourant==1: #On n'a pas besoin de créer un objet "partie" dans niveau pour accès à ces attributs
@@ -112,10 +127,12 @@ class Niveau():
 
     #Création des icones de tour selon le tableau défini dans la classe Partie
     def genererIconesTours(self):
+        index=0
         if self.prtPartie.niveauCourant==1:
             for x,y in self.prtPartie.listIconesToursN1:
-                iconeTour=IconeTour(self,x,y)
+                iconeTour=IconeTour(self,x,y,self.prtPartie.listTypeIconeN1[index])
                 self.listIconesTours.append(iconeTour)
+                index=index+1
 
 #TODO: passer un dictionaire de creeps?
 class Vague():
@@ -132,7 +149,7 @@ class Sentier():
         self.prtNiveau = niveau
         self.largeur = 30
         self.couleur = "black"
-        self.chemin = [[0,200],[200,200],[200,400],[350,400],[350,400],[350,150],[500,150],[500,500],[700,500],[700,0]]
+        self.chemin = [[0,200],[200,200],[200,400],[350,400],[350,150],[500,150],[500,400],[700,400],[700,0]]
 #        self.chemin = [[700,0],[700,500],[500,500],[500,150],[350,150],[350,400],[200,400],[200,200],[0,200]] # meme chemin mais inverse
 
 class AireDeConstruction():
@@ -153,7 +170,7 @@ class Creep():
         self.positionX = self.prtVague.prtNiveau.sentier.chemin[0][0]
         self.positionY = self.prtVague.prtNiveau.sentier.chemin[0][1]
         self.ptsVie = 3 #TODO: cette variable devra être passée en argument par la vague
-        self.pas = 4 #TODO: cette variable devra être passée en argument par la vague
+        self.pas = 10 #TODO: cette variable devra être passée en argument par la vague
         self.vitesse = 50
         self.valeur = 10 #TODO: cette variable devra être passée en argument par la vague
         self.puissanceDommage = 1 #TODO: cette variable devra être passée en argument par la vague
@@ -177,14 +194,12 @@ class Creep():
         
         # Creep va vers la droite 
         if self.positionX < destinationX:
-            print("droite")
             if self.positionX + self.pas >= destinationX:
                 self.chVelosite[0] = destinationX - self.positionX
             else:
                 self.chVelosite[0] = self.pas
         # Creep va vers la gauche 
         elif self.positionX > destinationX:
-            print("gauche")
             if self.positionX - self.pas <= destinationX:
                 self.chVelosite[0] = destinationX - self.positionX
             else:
@@ -196,14 +211,12 @@ class Creep():
 
         # Creep va vers le bas
         if self.positionY < destinationY:
-            print("bas")
             if self.positionY + self.pas >= destinationY:
                 self.chVelosite[1] = destinationY - self.positionY
             else:
                 self.chVelosite[1] = self.pas
         # Creep va vers le haut
         elif self.positionY > destinationY:
-            print("haut")
             if self.positionY - self.pas <= destinationY:
                 self.chVelosite[1] = destinationY - self.positionY
             else:
@@ -229,6 +242,16 @@ class Creep():
     def transfererValeurCreep(self):
         self.prtVague.prtNiveau.prtPartie.argentJoueur += self.valeur
 
+    def verifierFinSentier(self):
+        chemin = self.prtVague.prtNiveau.sentier.chemin
+        fin = chemin[len(chemin) - 1]
+        if self.positionX >= fin[0]:
+            if self.positionY <= fin[1]:
+                return True
+            
+    def enleverPtsVieAuJoueur(self):
+        self.prtVague.prtNiveau.prtPartie.ptsVieJoueur -= self.puissanceDommage
+
 class Tour():
     def __init__(self, niveau,x,y):
         self.prtNiveau = niveau
@@ -240,6 +263,7 @@ class Tour():
         self.type = "Tour" #TODO: plusieurs types de tour seront implemantes
         self.range = 200
         self.freqAttaque = 25
+#        self.cibleChoisie = False #TODO: test?
 
     def attaqueDeTour(self, creep):
         projectile = Projectile(self, creep)
@@ -250,20 +274,53 @@ class Tour():
         distance = helper.Helper.calcDistance(self.posX, self.posY, creep.positionX, creep.positionY)
         return distance
 
+class Tour_Roche(Tour):
+    def __init__(self, niveau,x,y):
+        Tour.__init__(self, niveau,x,y)
+        self.type="TourRoche"
+        
+class Tour_Feu(Tour):
+    def __init__(self, niveau,x,y):
+        Tour.__init__(self, niveau,x,y)
+        self.type="TourFeu"
+        self.couleur="red"
+        
+class Tour_Canon(Tour):
+    def __init__(self, niveau,x,y):
+        Tour.__init__(self, niveau,x,y)
+        self.type="TourFeu"
+        self.couleur="blue"
+        
+class Tour_Goo(Tour):
+    def __init__(self, niveau,x,y):
+        Tour.__init__(self, niveau,x,y)
+        self.type="TourFeu"
+        self.couleur="dark green"
+
 class IconeTour():
-    def __init__(self, niveau, x, y):
+    def __init__(self, niveau, x, y, type):
         self.prtNiveau = niveau
-        self.largeur=30
-        self.hauteur=30
+        self.largeur=25
+        self.hauteur=25
         self.posX=x
         self.posY=y
         self.couleur="light grey"
-        self.type="Tour" #TODO: plusieurs types de tour seront implantés
-        self.tour=Tour(self,x,y)
+        self.type=type 
+        self.definirTypeTour()
         #Prend une image de tour et la réduit de moitié. C'est cette image qui apparait à l'intérieur de l'icone
         self.tour.largeur=self.tour.largeur/2
         self.tour.hauteur=self.tour.hauteur/2
         self.rect = Rect(self.posX, self.posY, self.largeur,self.hauteur)
+
+    def definirTypeTour(self):
+        if(self.type=="TourRoche"):
+            self.tour=Tour_Roche(self,self.posX,self.posY)
+        elif(self.type=="TourFeu"):
+            self.tour=Tour_Feu(self,self.posX,self.posY)
+        elif(self.type=="TourCanon"):
+            self.tour=Tour_Canon(self,self.posX,self.posY)
+        elif(self.type=="TourGoo"):
+            self.tour=Tour_Goo(self,self.posX,self.posY)
 
 class Projectile():
     def __init__(self, tour, creep):
@@ -332,6 +389,14 @@ class Projectile():
             self.trajectoireY = (+1 * deltaY) 
         else:
             self.trajectoireY = 0
+
+class Interface_jeu():
+    def __init__(self):
+        self.posX = 400
+        self.posY = 525
+        self.largeur = 400
+        self.hauteur = 75
+        self.couleur="gray21"
 
 class Cercle():
     def __init__(self, x, y, rayon):

@@ -10,14 +10,20 @@ class Controleur():
         self.vue.disposerEcran(self.jeu.partie.niveau.sentier)
         self.animer()
         self.dessinerAiresConstruction()
+        self.dessinerInterfaceJeu()
         self.dessinerIconesTours()
         self.vue.detecterClick()
+        self.gameOver=False
 
     def animer(self):
+        gameOver=self.jeu.partie.verifierGameOver()
+        if (gameOver == True):
+            self.vue.afficherGameOver()
         self.vue.effacerAnimationPrecedente()
         self.jeu.faireAction()
         self.vue.afficherCreeps(self.jeu.partie.niveau.vague)
         self.vue.afficherProjectiles(self.jeu) #TODO: projectiles dans jeu
+        self.vue.afficherStats(self.jeu.partie.argentJoueur, self.jeu.partie.ptsVieJoueur)
         self.vue.root.after(50, self.animer)
 
     def syncMoveCreep(self, creep):
@@ -30,6 +36,7 @@ class Controleur():
         if self.jeu.partie.niveau.vague.nbCreepsActif < self.jeu.partie.niveau.vague.nbCreepsTotal:
             self.jeu.partie.niveau.vague.listCreeps.append(im.Creep(self.jeu.partie.niveau.vague))
             self.jeu.partie.niveau.vague.nbCreepsActif += 1
+            #TODO: generaliser le delai de creation des creeps
             self.vue.root.after(1000, self.syncCreerCreep)
 
     #Lorsque la vue détecte un "click gauche de la souris" elle appelle cette fonction afin que le contrôleur
@@ -48,6 +55,9 @@ class Controleur():
 
     def dessinerIconesTours(self):
         self.vue.dessinerIconesTours(self.jeu.partie.niveau.listIconesTours)
+
+    def dessinerInterfaceJeu(self):
+        self.vue.dessinerInterfaceJeu(self.jeu.partie.niveau.interfaceJeu)
 
 if __name__ == '__main__':
     c=Controleur()

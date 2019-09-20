@@ -1,3 +1,4 @@
+
 # -*- coding: iso-8859-1 -*-
 
 from tkinter import *
@@ -32,6 +33,7 @@ class Vue():
 
     def afficherCreeps(self, vague):
         for i in vague.listCreeps:
+            #TODO: generaliser
             creep=self.canevasDessin.create_oval(i.positionX, i.positionY, i.positionX+10, i.positionY+10, fill="yellow", tags=("creep"))
             self.creepsAEffacer.append(creep)
 
@@ -42,6 +44,7 @@ class Vue():
         for j in self.projectilesAEffacer:
             self.canevasDessin.delete(j)
         self.projectilesAEffacer.clear()
+        self.canevasDessin.delete("argent", "ptsVie")
 
     def afficherProjectiles(self, jeu):
         for i in jeu.listProjectiles:
@@ -53,7 +56,6 @@ class Vue():
         self.canevasDessin.create_rectangle(aire.posX-aire.largeur,aire.posY-aire.hauteur,aire.posX+aire.largeur,
                                           aire.posY+aire.hauteur,fill=aire.couleur)
 
-    #TODO: Logique?
     #Dessine toutes les aires de construction d'un aire de jeu.
     def dessinerAires(self, listAires):
         for i in listAires:
@@ -67,8 +69,7 @@ class Vue():
 
     #Dessine toutes les tours d'un aire de jeu. Éventuellement ce sera selon le type choisi.
     def dessinerTour(self, tour):
-        if (tour.type=="Tour"):
-            self.dessinerUneTour(tour)
+        self.dessinerUneTour(tour)
 
     #TODO: Pour l'instant il n'y a qu'un seul type d'icone de tour. Éventuellement chaque type de tour aura sa fonction dessiner
     #TODO: Pour l'instant c'est un rectangle mais on pourra facilement importer des sprites
@@ -81,15 +82,38 @@ class Vue():
     #Dessine toutes les icones de tour d'un aire de jeu. Éventuellement ce sera selon le type choisi.
     def dessinerIconesTours(self, listIconesTours):
         for i in listIconesTours:
-            if i.type=="Tour":
-                self.dessinerUneIconeTour(i)
+            self.dessinerUneIconeTour(i)
+    
+    def dessinerInterfaceJeu(self,interfaceJeu):
+        self.canevasDessin.create_rectangle(interfaceJeu.posX-interfaceJeu.largeur,interfaceJeu.posY-interfaceJeu.hauteur,interfaceJeu.posX+interfaceJeu.largeur,
+                                          interfaceJeu.posY+interfaceJeu.hauteur,fill=interfaceJeu.couleur)
 
     # Détecte un événement "click bouton gauche de la souris"
     def detecterClick(self):
         self.canevasDessin.bind("<Button-1>", self.prtControleur.event_click)
 
+    def afficherStats(self, argent, ptsVie):
+        self.afficherArgent(argent)
+        self.afficherPtsVie(ptsVie)
+        
+    def afficherArgent(self, argent):
+        money = str(argent)
+        texte="Argent: " + money
+        texte += " $"
+        self.canevasDessin.create_text(700, 535, justify="right", text=texte, font="Helvetica", fill="white", tags = ('argent'))
+    
+    def afficherPtsVie(self, ptsVie):
+        vie = str(ptsVie)
+        texte = "Il vous reste " + vie
+        texte += " vies"
+        self.canevasDessin.create_text(700, 560, justify="right", text=texte, font="Helvetica", fill="white", tags = ('ptsVie'))
+        
+    def afficherGameOver(self):
+        texte = "GAME OVER"
+        self.canevasDessin.create_text(700, 580, justify="right", text=texte, font=("Helvetica"), fill="red", tags = ('game over'))
+     
+
 if __name__ == '__main__':
     v=Vue(None)
-#    v.detecterClick() TODO: Detecter un clique a l'interieur d'un triangle
     v.root.mainloop()
     print ("Fin Vue")
