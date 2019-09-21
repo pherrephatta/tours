@@ -5,20 +5,20 @@ from tkinter import *
 from test.test_importlib.namespace_pkgs.project1 import parent
 
 class Vue():
-    def __init__(self, controleur):
+    def __init__(self, controleur, largeur, hauteur):
         self.prtControleur = controleur
         self.root = Tk()
-        self.hauteur = 600
-        self.largeur = 800
+        self.largeur = largeur
+        self.hauteur = hauteur
         self.creepsAEffacer = []
         self.projectilesAEffacer = []
 
     #TODO: Placer les elements dans __init__ (faire reference au meme canevas/cadre)
     def disposerEcran(self, sentier):
-        self.cadreMenu = Frame(self.root, bg="grey",width=800, height=600)
+        self.cadreMenu = Frame(self.root, bg="grey",width=self.largeur, height=self.hauteur)
         self.cadreMenu.pack()
 
-        self.cadreDessin = Frame(self.root, bg="black", width=800, height=600)
+        self.cadreDessin = Frame(self.root, bg="black", width=self.largeur, height=self.hauteur)
         self.cadreDessin.pack()
 
         self.canevasDessin = Canvas(self.cadreDessin,width=self.largeur, height=self.hauteur, bg="green")
@@ -34,7 +34,7 @@ class Vue():
     def afficherCreeps(self, vague):
         for i in vague.listCreeps:
             #TODO: generaliser
-            creep=self.canevasDessin.create_oval(i.positionX, i.positionY, i.positionX+10, i.positionY+10, fill="yellow", tags=("creep"))
+            creep = self.canevasDessin.create_oval(i.positionX, i.positionY, i.positionX+i.largeur, i.positionY+i.hauteur, fill = "yellow", tags = ("creep"))
             self.creepsAEffacer.append(creep)
 
     def effacerAnimationPrecedente(self):
@@ -47,9 +47,10 @@ class Vue():
         self.canevasDessin.delete("argent", "ptsVie")
 
     def afficherProjectiles(self, jeu):
-        for i in jeu.listProjectiles:
-            projectile=self.canevasDessin.create_rectangle(i.posX, i.posY, i.posX+5, i.posY+5, fill="red", tags=("projectile"))
-            self.projectilesAEffacer.append(projectile)
+        for i in jeu.partie.niveau.listTours:
+            for j in i.listProjectiles:
+                projectile=self.canevasDessin.create_rectangle(j.posX, j.posY, j.posX+5, j.posY+5, fill="red", tags=("projectile"))
+                self.projectilesAEffacer.append(projectile)
 
     #TODO: Pour l'instant c'est un rectangle mais on pourra facilement importer des sprites
     def dessinerUneAire(self, aire):
@@ -65,7 +66,7 @@ class Vue():
     #TODO: Pour l'instan c'est un rectangle mais on pourra facilement importer des sprites
     def dessinerUneTour(self,tour):
         self.canevasDessin.create_rectangle(tour.posX-tour.largeur,tour.posY-tour.hauteur,tour.posX+tour.largeur,
-                                          tour.posY+tour.hauteur,fill=tour.couleur)
+                                          tour.posY+tour.hauteur,fill=tour.couleur, tags=('IconeTour'))
 
     #Dessine toutes les tours d'un aire de jeu. Éventuellement ce sera selon le type choisi.
     def dessinerTour(self, tour):
@@ -83,10 +84,12 @@ class Vue():
     def dessinerIconesTours(self, listIconesTours):
         for i in listIconesTours:
             self.dessinerUneIconeTour(i)
-    
-    def dessinerInterfaceJeu(self,interfaceJeu):
+   
+    def dessinerInterfaceJeu(self,interfaceJeu,zoneDescription):
         self.canevasDessin.create_rectangle(interfaceJeu.posX-interfaceJeu.largeur,interfaceJeu.posY-interfaceJeu.hauteur,interfaceJeu.posX+interfaceJeu.largeur,
                                           interfaceJeu.posY+interfaceJeu.hauteur,fill=interfaceJeu.couleur)
+        self.canevasDessin.create_rectangle(zoneDescription.posX-zoneDescription.largeur,zoneDescription.posY-zoneDescription.hauteur,zoneDescription.posX+zoneDescription.largeur,
+                                          zoneDescription.posY+zoneDescription.hauteur,fill=zoneDescription.couleur)
 
     # Détecte un événement "click bouton gauche de la souris"
     def detecterClick(self):
@@ -100,20 +103,25 @@ class Vue():
         money = str(argent)
         texte="Argent: " + money
         texte += " $"
-        self.canevasDessin.create_text(700, 535, justify="right", text=texte, font="Helvetica", fill="white", tags = ('argent'))
+        self.canevasDessin.create_text(700, 475, justify="right", text=texte, font="Helvetica", fill="white", tags = ('argent'))
     
     def afficherPtsVie(self, ptsVie):
         vie = str(ptsVie)
         texte = "Il vous reste " + vie
         texte += " vies"
-        self.canevasDessin.create_text(700, 560, justify="right", text=texte, font="Helvetica", fill="white", tags = ('ptsVie'))
+        self.canevasDessin.create_text(700, 500, justify="right", text=texte, font="Helvetica", fill="white", tags = ('ptsVie'))
         
     def afficherGameOver(self):
         texte = "GAME OVER"
-        self.canevasDessin.create_text(700, 580, justify="right", text=texte, font=("Helvetica"), fill="red", tags = ('game over'))
-     
+        self.canevasDessin.create_text(400, 525, justify="center", text=texte, font=("Helvetica"), fill="red", tags = ('game over'))
+    
+    def afficherDescriptionTour(self, tour):
+        self.canevasDessin.create_text(400, 525, justify="left", text=tour.description, font=("Courier 9"), fill="white", tags = ('DescriptionTour'))
+    
+    def effacerDescriptionTour(self):
+        self.canevasDessin.delete("DescriptionTour")
 
 if __name__ == '__main__':
-    v=Vue(None)
+    v=Vue(None, 800, 600)
     v.root.mainloop()
     print ("Fin Vue")

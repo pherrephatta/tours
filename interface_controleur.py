@@ -5,8 +5,10 @@ import interface_vue as iv
 
 class Controleur():
     def __init__(self):
-        self.vue = iv.Vue(self)
-        self.jeu = im.Jeu(self)
+        self.fntLargeur = 800
+        self.fntHauteur = 600
+        self.vue = iv.Vue(self, self.fntLargeur, self.fntHauteur)
+        self.jeu = im.Jeu(self, self.fntLargeur, self.fntHauteur)
         self.vue.disposerEcran(self.jeu.partie.niveau.sentier)
         self.animer()
         self.dessinerAiresConstruction()
@@ -39,6 +41,11 @@ class Controleur():
             #TODO: generaliser le delai de creation des creeps
             self.vue.root.after(1000, self.syncCreerCreep)
 
+    def syncCreerProjectile(self, tour):
+        tour.pretTir = False
+        tour.listProjectiles.append(im.Projectile(tour))
+        self.vue.root.after(tour.freqAttaque * 10, tour.attaquerCible)
+
     #Lorsque la vue détecte un "click gauche de la souris" elle appelle cette fonction afin que le contrôleur
     #transmette l'événement au modèle. position = position du curseur de la souris lors du click.
     def event_click(self,position):
@@ -55,9 +62,15 @@ class Controleur():
 
     def dessinerIconesTours(self):
         self.vue.dessinerIconesTours(self.jeu.partie.niveau.listIconesTours)
-
+    
     def dessinerInterfaceJeu(self):
-        self.vue.dessinerInterfaceJeu(self.jeu.partie.niveau.interfaceJeu)
+        self.vue.dessinerInterfaceJeu(self.jeu.partie.niveau.interfaceJeu,self.jeu.partie.niveau.zoneDescription)
+        
+    def afficherDescriptionTour(self,tour):
+        self.vue.afficherDescriptionTour(tour)
+    
+    def effacerDescriptionTour(self):
+        self.vue.effacerDescriptionTour()
 
 if __name__ == '__main__':
     c=Controleur()
