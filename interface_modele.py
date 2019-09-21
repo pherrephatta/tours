@@ -2,8 +2,10 @@
 
 import helper
 
-#TODO: changer % de 25 de creation de projectile pour un after()
-#TODO: Individualiser l'attaque des tours
+#TODO: Indicateur du curseur(?)
+#TODO: Changer le choix de tour meme avec une tour deja selectionner
+#TODO: Sprites
+#TODO: Animation des sprites
 
 class Jeu():
     def __init__(self, controleur, largeur=800, hauteur=600):
