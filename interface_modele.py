@@ -3,11 +3,15 @@
 import helper
 
 # Trello?
-#TODO: Changer le choix de tour meme avec une tour deja selectionner
+#TODO: Projectiles bug si creep sont trop vite
+#TODO: Fin de sentier des creeps
+#TODO: Effacer projectiles si hors du range de la tour
+#TODO: Ecran fige au game over 
 #TODO: Sprites
 #TODO: Animation des sprites
 #TODO: Ecran proportionnel (frame de construction?)
 #TODO: --Indicateur du curseur(?)
+#TODO: --Changer le choix de tour meme avec une tour deja selectionner(?)
 
 class Jeu():
     def __init__(self, controleur, largeur=800, hauteur=600):
