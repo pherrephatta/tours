@@ -2,10 +2,12 @@
 
 import helper
 
-#TODO: Indicateur du curseur(?)
+# Trello?
 #TODO: Changer le choix de tour meme avec une tour deja selectionner
 #TODO: Sprites
 #TODO: Animation des sprites
+#TODO: Ecran proportionnel (frame de construction?)
+#TODO: --Indicateur du curseur(?)
 
 class Jeu():
     def __init__(self, controleur, largeur=800, hauteur=600):
@@ -58,13 +60,14 @@ class Jeu():
                 projectile.prtTour.listProjectiles.remove(projectile)
                 projectile.prtTour.cible.soustrairePtsVieCreep(projectile)
                 if projectile.prtTour.cible.verifierSiCreepEstMort():
-                    projectile.prtTour.prtNiveau.vague.listCreeps.remove(projectile.prtTour.cible)
-                    projectile.prtTour.cible.transfererValeurCreep()
-                    # Enlever le creep des tours qui le vise
-                    cible = projectile.prtTour.cible
-                    for i in self.partie.niveau.listTours:
-                        if cible == i.cible:
-                            i.cible = None
+                    if projectile.prtTour.cible in projectile.prtTour.prtNiveau.vague.listCreeps:
+                        projectile.prtTour.prtNiveau.vague.listCreeps.remove(projectile.prtTour.cible)
+                        projectile.prtTour.cible.transfererValeurCreep()
+                        # Enlever le creep des tours qui le vise
+                        cible = projectile.prtTour.cible
+                        for i in self.partie.niveau.listTours:
+                            if cible == i.cible:
+                                i.cible = None
             # Si la tour n'a plus de cible, avancer et effacer le projectile une fois a sa cible
             else:
                 projectile.prtTour.listProjectiles.remove(projectile)
@@ -76,9 +79,13 @@ class Jeu():
         if self.typeAconstruire == "None":
             for t in self.partie.niveau.listIconesTours:
                 if t.rect.isInside(position.x, position.y):
-                    self.typeAconstruire = t.typeTour
-                    self.prtControleur.afficherDescriptionTour(t)
-                    print("Dans icone")
+                    if(t.tour.cout<=self.partie.argentJoueur):
+                        self.typeAconstruire = t.typeTour
+                        self.prtControleur.afficherDescriptionTour(t)
+                        print("Dans icone")
+                    else:
+                        self.prtControleur.manqueDargent()
+                        print("Pas d'argent")
                 else:
                     print("Pas dans icone")
         else:
@@ -93,6 +100,11 @@ class Jeu():
                         self.partie.niveau.construireTour(self.typeAconstruire, i.posX, i.posY)
                         self.typeAconstruire = "None"
                         self.prtControleur.effacerDescriptionTour()
+                        
+    def event_click_droit(self, event): 
+        if(self.typeAconstruire!="None"):
+            self.typeAconstruire="None"
+            self.prtControleur.constructionAnnulee()
 
 class Partie():
     def __init__(self, jeu):
@@ -135,7 +147,9 @@ class Niveau():
             tour = Tour_Canon(self,x,y)
         elif typeTour == "TourGoo":
             tour = Tour_Goo(self,x,y)
-       
+
+        #on charge le joueur le coût de la tour
+        self.prtPartie.argentJoueur -= tour.cout
         # On ne veut pas que le centre de la tour soit au centre de l'aire de construction. 
         tour.posY = tour.posY - tour.hauteur
         # ^-- pour que ce soit la base de la tour qui est sur l'aire.
@@ -195,7 +209,7 @@ class Creep():
         self.positionX = self.prtVague.prtNiveau.sentier.chemin[0][0]
         self.positionY = self.prtVague.prtNiveau.sentier.chemin[0][1]
         self.ptsVie = 3
-        self.pas = 4
+        self.pas = 2
         self.vitesse = 50
         self.valeur = 10
         self.puissanceDommage = 1
@@ -293,7 +307,9 @@ class Tour():
         self.freqAttaque = 25
         self.cible = None
         self.listProjectiles=[]
-        self.pretTir = True 
+        self.pretTir = True
+        self.puissance = 1
+        self.cout = 100
 
     def siCreepDansRange(self, creep):
         if abs(self.posX - creep.positionX) < self.range:
@@ -311,29 +327,37 @@ class Tour():
 class Tour_Roche(Tour):
     def __init__(self, niveau,x,y):
         Tour.__init__(self, niveau,x,y)
-        self.type="TourRoche"
-        self.description="Une tour qui lance des pierres à l'unité.\nDommage: minime\nFréquence: élevée"
-      
+        self.type = "TourRoche"
+        self.cout = 100
+        self.description = "Une tour qui lance des pierres à l'unité." \
+                            + "\nDommage: " + str(self.puissance) + "\nFréquence: " + str(self.freqAttaque) + "\nCout: " + str(self.cout)
+
 class Tour_Feu(Tour):
     def __init__(self, niveau,x,y):
         Tour.__init__(self, niveau,x,y)
-        self.type="TourFeu"
-        self.couleur="red"
-        self.description="Une tour qui lance des boules de feu qui\nsuivent leurs cibles.\nDommage: moyen\nFréquence: moyenne"
+        self.type = "TourFeu"
+        self.couleur = "red"
+        self.cout = 150
+        self.description = "Une tour qui lance des boules de feu qui\nsuivent leurs cibles." \
+                            + "\nDommage: " + str(self.puissance) + "\nFréquence: " + str(self.freqAttaque) + "\nCout: " + str(self.cout)
         
 class Tour_Canon(Tour):
     def __init__(self, niveau,x,y):
         Tour.__init__(self, niveau,x,y)
-        self.type="TourFeu"
-        self.couleur="blue"
-        self.description="Une tour qui lance des boulets de canon\nen lignes droites.\nDommage: élevé\nFréquence: faible"
-        
+        self.type = "TourFeu"
+        self.couleur = "blue"
+        self.cout = 200
+        self.description = "Une tour qui lance des boules de canon\nen lignes droites" \
+                            + "\nDommage: " + str(self.puissance) + "\nFréquence: " + str(self.freqAttaque) + "\nCout: " + str(self.cout)
+
 class Tour_Goo(Tour):
     def __init__(self, niveau,x,y):
         Tour.__init__(self, niveau,x,y)
         self.type="TourFeu"
         self.couleur="dark green"
-        self.description="Une tour qui lance des projectiles gluants\nqui ralentissent leurs cibles.\nDommage: aucun\nFréquence: moyenne"
+        self.cout=120
+        self.description = "Une tour qui lance des projectiles gluants\nqui ralentissent leurs cibles" \
+                            + "\nDommage: " + str(self.puissance) + "\nFréquence: " + str(self.freqAttaque) + "\nCout: " + str(self.cout)
 
 class IconeTour():
     def __init__(self, niveau, x, y, typeTour):
@@ -370,7 +394,7 @@ class Projectile():
         self.trajectoireX = 0
         self.trajectoireY = 0
         self.vitesse = 50        
-        self.puissance = 1
+        self.puissance = self.prtTour.puissance
         self.pas = 10
         self.cible = self.prtTour.cible
 
