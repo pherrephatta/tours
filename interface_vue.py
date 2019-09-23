@@ -31,10 +31,28 @@ class Vue():
         self.boutonQuitter=Button(self.cadreMenu,text="Quitter",command=self.root.quit,bg="grey",fg="red")
         self.boutonQuitter.pack(side=RIGHT)
 
+        ###### PORTAIL #######
+        indiceCheminSentier = len(sentier.chemin) - 1
+        largeurPortail = 70
+        hauteurPortail = 70
+        #Calcul coordonnées portail
+        pX1 = sentier.chemin[indiceCheminSentier][0] - (largeurPortail/2)
+        pX2 = sentier.chemin[indiceCheminSentier][0] + (largeurPortail/2)
+        pY1 = sentier.chemin[indiceCheminSentier][1] - (hauteurPortail/2)
+        pY2 = sentier.chemin[indiceCheminSentier][1] + (hauteurPortail/2)
+        #print(pX1)
+        #input("test")
+        self.canevasDessin.create_rectangle(pX1, pY1, pX2, pY2, fill="blue", tags=("portail"))
+
     def afficherCreeps(self, vague):
         for i in vague.listCreeps:
             #TODO: generaliser
-            creep = self.canevasDessin.create_oval(i.positionX, i.positionY, i.positionX+i.largeur, i.positionY+i.hauteur, fill = "yellow", tags = ("creep"))
+            if i.nom == "creepFacile":
+                creep = self.canevasDessin.create_oval(i.positionX, i.positionY, i.positionX+i.largeur, i.positionY+i.hauteur, fill = "pink", tags = ("creep"))
+            elif i.nom == "creepDifficile":
+                creep = self.canevasDessin.create_oval(i.positionX, i.positionY, i.positionX+i.largeur, i.positionY+i.hauteur, fill = "yellow", tags = ("creep"))
+            elif i.nom == "creepBoss":
+                creep = self.canevasDessin.create_oval(i.positionX, i.positionY, i.positionX+i.largeur, i.positionY+i.hauteur, fill = "red", tags = ("creep"))
             self.creepsAEffacer.append(creep)
 
     def effacerAnimationPrecedente(self):
@@ -49,7 +67,7 @@ class Vue():
     def afficherProjectiles(self, jeu):
         for i in jeu.partie.niveau.listTours:
             for j in i.listProjectiles:
-                projectile=self.canevasDessin.create_rectangle(j.posX, j.posY, j.posX+5, j.posY+5, fill="red", tags=("projectile"))
+                projectile=self.canevasDessin.create_rectangle(j.posX, j.posY, j.posX+5, j.posY+5, fill=j.couleur, tags=("projectile"))
                 self.projectilesAEffacer.append(projectile)
 
     #TODO: Pour l'instant c'est un rectangle mais on pourra facilement importer des sprites
@@ -97,6 +115,10 @@ class Vue():
         
     def detecterClickDroit(self):
         self.canevasDessin.bind("<Button-3>", self.prtControleur.event_click_droit)
+        
+    def annulerClicks(self): #En cas de gameOver si on annule pas le bind on peut continuer à construire
+        self.canevasDessin.unbind("<Button-1>")
+        self.canevasDessin.unbind("<Button-3>")
 
     def afficherStats(self, argent, ptsVie):
         self.afficherArgent(argent)
@@ -134,9 +156,29 @@ class Vue():
         self.effacerDescriptionTour()
         self.canevasDessin.create_text(400, 525, justify="left", text=texte, font=("Courier 14 bold"), fill="white", tags = ('ConstructionAnnulee'))
         self.root.after(1000, self.canevasDessin.delete,"ConstructionAnnulee")
+    
+    def afficherMenuFinDePartie(self):
+        texte = "Fin de partie"
+        largeurMenu = 200
+        hauteurMeu = 100
+        coordX1 = (self.largeur - largeurMenu)/2
+        coordY1 = (self.hauteur - hauteurMeu)/2
+        coordX2 = coordX1 + largeurMenu
+        coordY2 = coordY1 + hauteurMeu
+        self.canevasDessin.create_rectangle(coordX1, coordY1, coordX2, coordY2, fill="red", tags = ('gameOver'))
+        coordTextX = coordX1 + ((coordX2 - coordX1) /2)
+        coordTextY = coordY1 + 20
+        self.canevasDessin.create_text(coordTextX, coordTextY, justify="center", text=texte, font=("Helvetica"), fill="black", tags = ('gameOver'))
+        coordBoutonX = coordX1 + 73
+        self.boutonRejouer=Button(self.cadreDessin,text="Rejouer",bg="grey", command=self.reJouer)
+        self.boutonRejouer.place(x=coordBoutonX, y=coordTextY +20)
+        self.boutonQuitter=Button(self.cadreDessin,text="Quitter",bg="grey", command=self.quitter)
+        self.boutonQuitter.place(x=coordBoutonX, y=coordTextY +50)
+
+    def reJouer(self):
+        self.prtControleur.restart = 1
+    
+    def quitter(self):
+        self.root.quit        
 
 
-if __name__ == '__main__':
-    v=Vue(None, 800, 600)
-    v.root.mainloop()
-    print ("Fin Vue")
