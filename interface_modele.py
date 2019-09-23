@@ -195,7 +195,7 @@ class Creep():
         self.positionX = self.prtVague.prtNiveau.sentier.chemin[0][0]
         self.positionY = self.prtVague.prtNiveau.sentier.chemin[0][1]
         self.ptsVie = 3
-        self.pas = 2
+        self.pas = 4
         self.vitesse = 50
         self.valeur = 10
         self.puissanceDommage = 1
