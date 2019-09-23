@@ -1,0 +1,4 @@
+recommencer une game
+generaliser hitbox
+regler trajectoires
+sprites
