@@ -15,6 +15,7 @@ class Controleur():
         self.dessinerInterfaceJeu()
         self.dessinerIconesTours()
         self.vue.detecterClick()
+        self.vue.detecterClickDroit()
         self.gameOver=False
 
     def animer(self):
@@ -50,6 +51,9 @@ class Controleur():
     #transmette l'événement au modèle. position = position du curseur de la souris lors du click.
     def event_click(self,position):
         self.jeu.event_click(position);
+    
+    def event_click_droit(self,event): #event au lieu de position car la position n'est pas utilisée
+        self.jeu.event_click_droit(event)
 
     #TODO: J'ai fait en sorte que dans modèle le jeu génère lui même ses parties qui elles génèrent automatiquement
     # ses niveaux. Il faudra discuter si on veut passer par le contrôleur pour ces éléments.
@@ -71,6 +75,12 @@ class Controleur():
     
     def effacerDescriptionTour(self):
         self.vue.effacerDescriptionTour()
+    
+    def manqueDargent(self):
+        self.vue.afficherPasDargent()
+    
+    def constructionAnnulee(self):
+        self.vue.afficherConstructionAnnulee()
 
 if __name__ == '__main__':
     c=Controleur()

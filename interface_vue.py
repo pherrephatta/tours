@@ -94,6 +94,9 @@ class Vue():
     # Détecte un événement "click bouton gauche de la souris"
     def detecterClick(self):
         self.canevasDessin.bind("<Button-1>", self.prtControleur.event_click)
+        
+    def detecterClickDroit(self):
+        self.canevasDessin.bind("<Button-3>", self.prtControleur.event_click_droit)
 
     def afficherStats(self, argent, ptsVie):
         self.afficherArgent(argent)
@@ -114,12 +117,24 @@ class Vue():
     def afficherGameOver(self):
         texte = "GAME OVER"
         self.canevasDessin.create_text(400, 525, justify="center", text=texte, font=("Helvetica"), fill="red", tags = ('game over'))
-    
+
+    def afficherPasDargent(self):
+        texte="Fond insuffisant"
+        self.canevasDessin.create_text(400, 525, justify="left", text=texte, font=("Courier 14 bold"), fill="red", tags = ('PasDargent'))
+        self.root.after(1000, self.canevasDessin.delete,"PasDargent")
+
     def afficherDescriptionTour(self, tour):
         self.canevasDessin.create_text(400, 525, justify="left", text=tour.description, font=("Courier 9"), fill="white", tags = ('DescriptionTour'))
     
     def effacerDescriptionTour(self):
         self.canevasDessin.delete("DescriptionTour")
+    
+    def afficherConstructionAnnulee(self):
+        texte="Construction annulée"
+        self.effacerDescriptionTour()
+        self.canevasDessin.create_text(400, 525, justify="left", text=texte, font=("Courier 14 bold"), fill="white", tags = ('ConstructionAnnulee'))
+        self.root.after(1000, self.canevasDessin.delete,"ConstructionAnnulee")
+
 
 if __name__ == '__main__':
     v=Vue(None, 800, 600)
