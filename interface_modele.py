@@ -1,7 +1,7 @@
 # -*- coding: iso-8859-1 -*-
 
 import helper
-import winsound
+#import winsound #TODO: winsound
 
 # Trello?
 #TODO: Changer le choix de tour meme avec une tour deja selectionner
@@ -57,8 +57,8 @@ class Jeu():
         tour.pretTir = False
         if(tour.type=="TourRoche"):
             tour.listProjectiles.append(Projectile_Roche(tour))
-        elif(tour.type=="TourFeu"):
-            tour.listProjectiles.append(Projectile_Feu(tour))     
+        elif tour.type == "TourFeu":
+            tour.listProjectiles.append(Projectile_Circulaire(tour))
         elif(tour.type=="TourCanon"):
             tour.listProjectiles.append(Projectile_Canon(tour))   
         elif(tour.type=="TourGoo"):
@@ -70,7 +70,7 @@ class Jeu():
         # Deplacer
         projectile.deplacerProjectile()
         # Si le projectile atteint sa cible
-        if projectile.verifierAtteinteCible():
+        if projectile.verifierAtteinteDesCibles():
             if projectile.cible == projectile.prtTour.cible:
                 projectile.prtTour.listProjectiles.remove(projectile)
                 projectile.prtTour.cible.soustrairePtsVieCreep(projectile)
@@ -141,6 +141,12 @@ class Partie():
             return True
         return False
 
+    def verifierFinNiveau(self):
+        if not self.niveau.vague.listCreeps:
+            self.prtJeu.prtControleur.annulerClicks()
+            return True
+        return False
+
 #TODO: Determiner nombre de creeps, types, etc.
 class Niveau():
     def __init__(self, partie):
@@ -174,7 +180,7 @@ class Niveau():
         # ^-- pour que ce soit la base de la tour qui est sur l'aire.
         self.listTours.append(tour)
         self.prtPartie.prtJeu.prtControleur.nouvelleTour(tour)
-        winsound.PlaySound(tour.sonConstruction, winsound.SND_FILENAME | winsound.SND_ASYNC)
+#        winsound.PlaySound(tour.sonConstruction, winsound.SND_FILENAME | winsound.SND_ASYNC) #TODO: winsound
         
     #Création des aires de construction selon le tableau défini dans la classe Partie
     def genererAiresConstruction(self):
@@ -310,7 +316,7 @@ class Creep():
 
     def transfererValeurCreep(self):
         self.prtVague.prtNiveau.prtPartie.argentJoueur += self.valeur
-        winsound.PlaySound(self.son, winsound.SND_FILENAME | winsound.SND_ASYNC)
+#        winsound.PlaySound(self.son, winsound.SND_FILENAME | winsound.SND_ASYNC) #TODO: winsound
 
     def verifierFinSentier(self):
         chemin = self.prtVague.prtNiveau.sentier.chemin
@@ -399,7 +405,10 @@ class Tour_Feu(Tour):
         self.description = "Une tour qui lance des boules de feu qui\nsuivent leurs cibles." \
                             + "\nDommage: " + str(self.puissance) + "\nFréquence: " + str(self.freqAttaque) + "\nCout: " + str(self.cout)
         self.son = "./assets/sounds/tour_feu.wav" 
-        
+        self.freqAttaque = 2500
+        self.range = 100
+        self.puissance = 3
+       
 class Tour_Canon(Tour):
     def __init__(self, niveau,x,y):
         Tour.__init__(self, niveau,x,y)
@@ -457,25 +466,25 @@ class Projectile():
         self.vitesse = 1
         self.couleur = "yellow"    
         self.puissance = self.prtTour.puissance
-        self.pas = 25
+        self.pas = 3
         self.cible = self.prtTour.cible
 
-
-    def verifierAtteinteCible(self):
-        if self.cible.hitBox.isInside(self.posX, self.posY):
-            return True
+    def verifierAtteinteDesCibles(self):
+        for i in self.prtTour.prtNiveau.vague.listCreeps:
+            if i.hitBox.isInside(self.posX, self.posY):
+                return True
         return False
 
     def calculerDistanceCible(self):
         distance = helper.Helper.calcDistance(self.posX, self.posY, self.cible.positionX, self.cible.positionY)
         return distance
 
-
 class Projectile_Roche(Projectile):
     def __init__(self, tour):
         Projectile.__init__(self, tour)
         self.couleur = "dim grey"
         self.calculerTrajectoire()
+        self.type = "pRoche"
     
     def deplacerProjectile(self):
         self.posX += (self.pas * self.trajectoireX)
@@ -503,49 +512,89 @@ class Projectile_Roche(Projectile):
         else:
             self.trajectoireY = 0
         
-
-class Projectile_Feu(Projectile):
-    def __init__(self, tour):
-        Projectile.__init__(self, tour)
-        self.couleur = "red"
-
-    def deplacerProjectile(self):
-        self.calculerTrajectoire()
-        self.posX += (self.pas * self.trajectoireX)
-        self.posY += (self.pas * self.trajectoireY)
-        
-    # Trajectoir tete-chercheuse
-    def calculerTrajectoire(self):
-        cible=[self.cible.positionX, self.cible.positionY]
-        distance = self.prtTour.calculerDistanceTourCible(self.cible)
-        incrementX = abs(self.posX - self.cible.positionX)/distance
-        incrementY = abs(self.posY - self.cible.positionY)/distance
-        if cible[0] < self.posX:
-            self.trajectoireX = -1
-        elif cible[0] > self.posX:
-            self.trajectoireX = +1
-        else:
-            self.trajectoireX = 0
-        if cible[1] < self.posY:
-            self.trajectoireY = -1
-        elif cible[1] > self.posY:
-            self.trajectoireY = +1
-        else:
-            self.trajectoireY = 0
-        
-        self.trajectoireX *= incrementX
-        self.trajectoireY *= incrementY
+#class Projectile_Feu(Projectile):
+#    def __init__(self, tour):
+#        Projectile.__init__(self, tour)
+#        self.couleur = "red"
+#
+#    def deplacerProjectile(self):
+#        self.calculerTrajectoire()
+#        self.posX += (self.pas * self.trajectoireX)
+#        self.posY += (self.pas * self.trajectoireY)
+#        
+#    # Trajectoir tete-chercheuse
+#    def calculerTrajectoire(self):
+#        cible=[self.cible.positionX, self.cible.positionY]
+#        distance = self.prtTour.calculerDistanceTourCible(self.cible)
+#        incrementX = abs(self.posX - self.cible.positionX)/distance
+#        incrementY = abs(self.posY - self.cible.positionY)/distance
+#        if cible[0] < self.posX:
+#            self.trajectoireX = -1
+#        elif cible[0] > self.posX:
+#            self.trajectoireX = +1
+#        else:
+#            self.trajectoireX = 0
+#        if cible[1] < self.posY:
+#            self.trajectoireY = -1
+#        elif cible[1] > self.posY:
+#            self.trajectoireY = +1
+#        else:
+#            self.trajectoireY = 0
+#        
+#        self.trajectoireX *= incrementX
+#        self.trajectoireY *= incrementY
         
 class Projectile_Canon(Projectile):
     def __init__(self, tour):
         Projectile.__init__(self, tour)
         self.couleur = "blue"
 
-
 class Projectile_Goo(Projectile):
     def __init__(self, tour):
         Projectile.__init__(self, tour)
         self.couleur="dark green"
+
+class Projectile_Circulaire(Projectile):
+    def __init__(self, tour):
+        Projectile.__init__(self, tour)
+        self.type = "pCirculaire"
+        self.departX = self.prtTour.posX
+        self.departY = self.prtTour.posY
+        self.rayon = self.prtTour.range
+        self.etendueDommage = self.calculerEtendueDommage()
+        self.x0 = self.departX
+        self.x1=self.departX
+        self.y0= self.departY
+        self.y1=self.departY
+        self.vitesseExplosion = 2
+    
+    def calculerEtendueDommage(self):
+        xMax0 = self.departX - self.rayon
+        yMax0 = self.departY - self.rayon
+        xMax1 = self.departX + self.rayon
+        yMax1 = self.departY + self.rayon
+        coordOvale = [xMax0, yMax0, xMax1, yMax1]
+        return coordOvale
+    
+    def deplacerProjectile(self):
+        if self.x0 > self.etendueDommage[0]:
+            self.x0 -= self.vitesseExplosion
+        else:
+            self.prtTour.listProjectiles.remove(self)
+        if self.x1 < self.etendueDommage[2]:
+            self.x1 += self.vitesseExplosion
+        if self.y0 > self.etendueDommage[1]:
+            self.y0 -= self.vitesseExplosion
+        if self.y1 < self.etendueDommage[3]:
+            self.y1 += self.vitesseExplosion
+
+    def verifierAtteinteDesCibles(self):
+        for i in self.prtTour.prtNiveau.vague.listCreeps:
+            if i.positionX >= self.x0 and i.positionX <= self.x1:
+                if i.positionY >= self.y0 and i.positionY <= self.y1:
+                    return True
+        return False
+
 
 class Interface_jeu():
     def __init__(self):
