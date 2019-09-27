@@ -1,0 +1,5 @@
+recommencer une game
+generaliser hitbox
+regler trajectoires
+-- une seule (- homing)
+sprites

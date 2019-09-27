@@ -10,22 +10,27 @@ class Controleur():
         self.vue = iv.Vue(self, self.fntLargeur, self.fntHauteur)
         self.jeu = im.Jeu(self, self.fntLargeur, self.fntHauteur)
         self.vue.disposerEcran(self.jeu.partie.niveau.sentier)
+        self.gameOver=False
+        self.finNiveau=False
         self.animer()
         self.dessinerAiresConstruction()
         self.dessinerInterfaceJeu()
         self.dessinerIconesTours()
         self.vue.detecterClick()
         self.vue.detecterClickDroit()
-        self.gameOver=False
         self.restart = None
         self.idAfter=None
 
     def animer(self):
-        gameOver=self.jeu.partie.verifierGameOver()
-        if (gameOver == True):
+        self.gameOver=self.jeu.partie.verifierGameOver()
+        if self.gameOver:
             self.vue.effacerAnimationPrecedente()
             self.vue.afficherStats(self.jeu.partie.argentJoueur, self.jeu.partie.ptsVieJoueur)
             self.vue.afficherGameOver()
+            self.vue.afficherMenuFinDePartie()
+        elif self.finNiveau:
+            self.vue.effacerNiveau()
+            self.vue.disposerEcran(self.jeu.partie.niveau.sentier)
         else: 
             self.vue.effacerAnimationPrecedente()
             self.jeu.faireAction()
@@ -33,6 +38,20 @@ class Controleur():
             self.vue.afficherProjectiles(self.jeu) #TODO: projectiles dans jeu
             self.vue.afficherStats(self.jeu.partie.argentJoueur, self.jeu.partie.ptsVieJoueur)
             self.vue.root.after(50, self.animer)
+        self.finNiveau=self.jeu.partie.verifierFinNiveau()
+
+#        gameOver=self.jeu.partie.verifierGameOver()
+#        if (gameOver == True):
+#            self.vue.effacerAnimationPrecedente()
+#            self.vue.afficherStats(self.jeu.partie.argentJoueur, self.jeu.partie.ptsVieJoueur)
+#            self.vue.afficherGameOver()
+#        else: 
+#            self.vue.effacerAnimationPrecedente()
+#            self.jeu.faireAction()
+#            self.vue.afficherCreeps(self.jeu.partie.niveau.vague)
+#            self.vue.afficherProjectiles(self.jeu) #TODO: projectiles dans jeu
+#            self.vue.afficherStats(self.jeu.partie.argentJoueur, self.jeu.partie.ptsVieJoueur)
+#            self.vue.root.after(50, self.animer)
 
     def syncMoveCreep(self, creep):
         self.vue.root.after(creep.vitesse, self.jeu.bougerCreep, creep)
@@ -44,7 +63,7 @@ class Controleur():
         if self.jeu.partie.niveau.vague.nbCreepsActif < self.jeu.partie.niveau.vague.nbCreepsTotal:
             self.jeu.partie.niveau.vague.listCreeps.append(im.CreepFacile(self.jeu.partie.niveau.vague))
             self.jeu.partie.niveau.vague.nbCreepsActif += 1
-            #TODO: generaliser le delai de creation des creeps
+            #TODO: generaliser?!?jedi=0,  le delai de creation des creeps?!? (ms, *_*func: Optional[Any]=...*_*, *args) ?!?jedi?!?
             self.vue.root.after(1000, self.syncCreerCreep)
 
     def syncCreerProjectile(self, tour):

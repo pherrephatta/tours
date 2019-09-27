@@ -67,7 +67,10 @@ class Vue():
     def afficherProjectiles(self, jeu):
         for i in jeu.partie.niveau.listTours:
             for j in i.listProjectiles:
-                projectile=self.canevasDessin.create_rectangle(j.posX, j.posY, j.posX+5, j.posY+5, fill=j.couleur, tags=("projectile"))
+                if j.type == "pCirculaire":
+                    projectile=self.canevasDessin.create_oval(j.x0, j.y0, j.x1, j.y1, fil="red", tags=("projectile"))
+                else:
+                    projectile=self.canevasDessin.create_rectangle(j.posX, j.posY, j.posX+5, j.posY+5, fill=j.couleur, tags=("projectile"))
                 self.projectilesAEffacer.append(projectile)
 
     #TODO: Pour l'instant c'est un rectangle mais on pourra facilement importer des sprites
@@ -157,6 +160,12 @@ class Vue():
         self.canevasDessin.create_text(400, 525, justify="left", text=texte, font=("Courier 14 bold"), fill="white", tags = ('ConstructionAnnulee'))
         self.root.after(1000, self.canevasDessin.delete,"ConstructionAnnulee")
     
+    def reJouer(self):
+        self.prtControleur.restart = 1
+    
+    def quitter(self):
+        self.root.quit        
+
     def afficherMenuFinDePartie(self):
         texte = "Fin de partie"
         largeurMenu = 200
@@ -175,10 +184,9 @@ class Vue():
         self.boutonQuitter=Button(self.cadreDessin,text="Quitter",bg="grey", command=self.quitter)
         self.boutonQuitter.place(x=coordBoutonX, y=coordTextY +50)
 
-    def reJouer(self):
-        self.prtControleur.restart = 1
-    
-    def quitter(self):
-        self.root.quit        
-
-
+    def effacerNiveau(self):
+        self.canevasDessin.pack_forget()
+        self.boutonMenu.pack_forget()
+        self.boutonQuitter.pack_forget()
+        self.cadreMenu.pack_forget()
+        self.cadreDessin.pack_forget()
