@@ -58,11 +58,8 @@ class Jeu():
         # Deplacer
         projectile.deplacerProjectile()
         # Si le projectile n'a plus de cible
-        if projectile.cible is not projectile.prtTour.cible:
-            if projectile.verifierAtteinteDeLaCible():
-                projectile.prtTour.listProjectiles.remove(projectile)
         # Si le projectile atteint sa cible
-        elif projectile.verifierAtteinteDesCibles():
+        if projectile.verifierAtteinteDesCibles():
             projectile.prtTour.listProjectiles.remove(projectile)
             projectile.cible.soustrairePtsVieCreep(projectile)
             if projectile.cible.verifierSiCreepEstMort():
@@ -73,6 +70,10 @@ class Jeu():
                 for t in self.partie.niveau.listTours:
                     if t.cible == projectile.cible:
                         t.cible = None
+        elif projectile.cible is not projectile.prtTour.cible:
+            if projectile.verifierAtteinteDeLaCible():
+                projectile.prtTour.listProjectiles.remove(projectile)
+
 
     # Fonction appelée par le contrôleur lorsque la vue détecte un click gauche de la souris.
     # position = position du curseur de la souris lors du click.
@@ -396,8 +397,8 @@ class Tour_Feu(Tour):
         self.description = "Une tour qui lance des boules de feu qui\nsuivent leurs cibles." \
                             + "\nDommage: " + str(self.puissance) + "\nFréquence: " + str(self.freqAttaque) + "\nCout: " + str(self.cout)
         self.son = "./assets/sounds/tour_feu.wav" 
-        self.freqAttaque = 200
-        self.range = 100
+        self.freqAttaque = 500
+        self.range = 200
         self.puissance = 3
        
 class Tour_Canon(Tour):
