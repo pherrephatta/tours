@@ -2,6 +2,7 @@
 # -*- coding: iso-8859-1 -*-
 
 from tkinter import *
+from PIL import Image, ImageTk
 from test.test_importlib.namespace_pkgs.project1 import parent
 
 class Vue():
@@ -12,6 +13,7 @@ class Vue():
         self.hauteur = hauteur
         self.creepsAEffacer = []
         self.projectilesAEffacer = []
+        self.imgTour = Image.open("./assets/sprites/tour.png")
 
     #TODO: Placer les elements dans __init__ (faire reference au meme canevas/cadre)
     def disposerEcran(self, sentier):
@@ -86,8 +88,14 @@ class Vue():
     #TODO: Pour l'instant il n'y a qu'un seul type de tour. Éventuellement chaque type de tour aura sa fonction dessiner
     #TODO: Pour l'instan c'est un rectangle mais on pourra facilement importer des sprites
     def dessinerUneTour(self,tour):
-        self.canevasDessin.create_rectangle(tour.posX-tour.largeur,tour.posY-tour.hauteur,tour.posX+tour.largeur,
-                                          tour.posY+tour.hauteur,fill=tour.couleur, tags=('IconeTour'))
+        imgTour = self.imgTour.resize((int(tour.largeur), int(tour.hauteur)))
+        imgTour = ImageTk.PhotoImage(imgTour)
+        # l'allocation a un label empeche l'image d'etre effacer par le garbage collector
+        label = Label()
+        label.image = imgTour
+        self.canevasDessin.create_image(tour.posX, tour.posY, image=imgTour, anchor=CENTER)
+#        self.canevasDessin.create_rectangle(tour.posX-tour.largeur,tour.posY-tour.hauteur,tour.posX+tour.largeur,
+ #                                         tour.posY+tour.hauteur,fill=tour.couleur, tags=('IconeTour'))
 
     #Dessine toutes les tours d'un aire de jeu. Éventuellement ce sera selon le type choisi.
     def dessinerTour(self, tour):
@@ -98,7 +106,7 @@ class Vue():
     def dessinerUneIconeTour(self,iconeTour):
         self.canevasDessin.create_rectangle(iconeTour.posX-iconeTour.largeur,iconeTour.posY-iconeTour.hauteur,
                                       iconeTour.posX+iconeTour.largeur, iconeTour.posY+iconeTour.hauteur,
-                                      fill=iconeTour.couleur)
+                                      fill="grey")
         self.dessinerUneTour(iconeTour.tour)
 
     #Dessine toutes les icones de tour d'un aire de jeu. Éventuellement ce sera selon le type choisi.

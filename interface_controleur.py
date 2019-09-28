@@ -7,67 +7,46 @@ class Controleur():
     def __init__(self):
         self.fntLargeur = 800
         self.fntHauteur = 600
+#        self.idAfter=None TODO: ??
+        self.restart = False
+        self.gameOver = False
+        self.finNiveau = False
+        self.msTime = 0
+        self.secTime = 0
+
         self.vue = iv.Vue(self, self.fntLargeur, self.fntHauteur)
         self.jeu = im.Jeu(self, self.fntLargeur, self.fntHauteur)
         self.vue.disposerEcran(self.jeu.partie.niveau.sentier)
-        self.gameOver=False
-        self.finNiveau=False
-        self.animer()
+        self.vue.detecterClick()
+        self.vue.detecterClickDroit()
         self.dessinerAiresConstruction()
         self.dessinerInterfaceJeu()
         self.dessinerIconesTours()
-        self.vue.detecterClick()
-        self.vue.detecterClickDroit()
-        self.restart = None
-        self.idAfter=None
+        self.animer()
 
     def animer(self):
-        self.gameOver=self.jeu.partie.verifierGameOver()
-        if self.gameOver:
-            self.vue.effacerAnimationPrecedente()
-            self.vue.afficherStats(self.jeu.partie.argentJoueur, self.jeu.partie.ptsVieJoueur)
-            self.vue.afficherGameOver()
-            self.vue.afficherMenuFinDePartie()
-        elif self.finNiveau:
-            self.vue.effacerNiveau()
-            self.vue.disposerEcran(self.jeu.partie.niveau.sentier)
-        else: 
-            self.vue.effacerAnimationPrecedente()
-            self.jeu.faireAction()
-            self.vue.afficherCreeps(self.jeu.partie.niveau.vague)
-            self.vue.afficherProjectiles(self.jeu) #TODO: projectiles dans jeu
-            self.vue.afficherStats(self.jeu.partie.argentJoueur, self.jeu.partie.ptsVieJoueur)
-            self.vue.root.after(50, self.animer)
-        self.finNiveau=self.jeu.partie.verifierFinNiveau()
+        self.msTime += 1
+        if self.msTime >= 1000:
+            self.msTime = 0
+            self.secTime += 1
 
-#        gameOver=self.jeu.partie.verifierGameOver()
-#        if (gameOver == True):
+#        self.gameOver=self.jeu.partie.verifierGameOver()
+#        if self.gameOver:
 #            self.vue.effacerAnimationPrecedente()
 #            self.vue.afficherStats(self.jeu.partie.argentJoueur, self.jeu.partie.ptsVieJoueur)
 #            self.vue.afficherGameOver()
+#            self.vue.afficherMenuFinDePartie()
+#        elif self.finNiveau:
+#            self.vue.effacerNiveau()
+#            self.vue.disposerEcran(self.jeu.partie.niveau.sentier)
 #        else: 
-#            self.vue.effacerAnimationPrecedente()
-#            self.jeu.faireAction()
-#            self.vue.afficherCreeps(self.jeu.partie.niveau.vague)
-#            self.vue.afficherProjectiles(self.jeu) #TODO: projectiles dans jeu
-#            self.vue.afficherStats(self.jeu.partie.argentJoueur, self.jeu.partie.ptsVieJoueur)
-#            self.vue.root.after(50, self.animer)
-
-    def syncMoveCreep(self, creep):
-        self.vue.root.after(creep.vitesse, self.jeu.bougerCreep, creep)
-        
-    def syncMoveProjectile(self, projectile):
-        self.vue.root.after(projectile.vitesse, self.jeu.bougerProjectile, projectile)
-
-    def syncCreerCreep(self):
-        if self.jeu.partie.niveau.vague.nbCreepsActif < self.jeu.partie.niveau.vague.nbCreepsTotal:
-            self.jeu.partie.niveau.vague.listCreeps.append(im.CreepFacile(self.jeu.partie.niveau.vague))
-            self.jeu.partie.niveau.vague.nbCreepsActif += 1
-            #TODO: generaliser?!?jedi=0,  le delai de creation des creeps?!? (ms, *_*func: Optional[Any]=...*_*, *args) ?!?jedi?!?
-            self.vue.root.after(1000, self.syncCreerCreep)
-
-    def syncCreerProjectile(self, tour):
-        self.vue.root.after(tour.freqAttaque, tour.attaquerCible)
+        self.vue.effacerAnimationPrecedente()
+        self.jeu.faireAction()
+        self.vue.afficherCreeps(self.jeu.partie.niveau.vague)
+        self.vue.afficherProjectiles(self.jeu)
+        self.vue.afficherStats(self.jeu.partie.argentJoueur, self.jeu.partie.ptsVieJoueur)
+        self.vue.root.after(1, self.animer)
+#        self.finNiveau=self.jeu.partie.verifierFinNiveau()
 
     #Lorsque la vue détecte un "click gauche de la souris" elle appelle cette fonction afin que le contrôleur
     #transmette l'événement au modèle. position = position du curseur de la souris lors du click.
