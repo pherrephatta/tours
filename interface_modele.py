@@ -21,7 +21,7 @@ class Jeu():
     # Recoit appel du controlleur a interval regulier
     def faireAction(self):
         if self.partie.niveau.vague.nbCreepsActif < self.partie.niveau.vague.nbCreepsTotal:
-            if self.prtControleur.msTime % 200 == 0:
+            if self.prtControleur.msTime % 200 == 0: #TODO: delai de creation
                 self.partie.niveau.vague.listCreeps.append(CreepDifficile(self.partie.niveau.vague))
                 self.partie.niveau.vague.nbCreepsActif += 1;
         # Faire bouger les creeps
@@ -133,7 +133,7 @@ class Niveau():
         self.listTours = [] # Stock les tours construies
         self.listIconesTours = [] # Les icones pour chaque tour
         #self.sentier = Sentier(self)
-        self.sentier = Sentier2(self) #TODO: décider comment on appelle un type de sentier selon le niveau
+        self.sentier = Sentier2(self) #TODO: Implementation de vagues
         self.vague = Vague(self, 5)
         self.genererAiresConstruction()
         self.genererIconesTours()
@@ -226,7 +226,7 @@ class Creep():
         self.positionY = self.prtVague.prtNiveau.sentier.chemin[0][1]
         self.ptsVie = 3
         self.pas = 1
-        self.vitesse = 10
+        self.vitesse = 5 
         self.valeur = 10
         self.puissanceDommage = 1
         self.largeur = 10
@@ -450,7 +450,7 @@ class Projectile():
         self.vitesse = 1
         self.couleur = "yellow"    
         self.puissance = self.prtTour.puissance
-        self.pas = 3
+        self.pas = 5
         self.cible = self.prtTour.cible
 
     def calculerDistanceCible(self):

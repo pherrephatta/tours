@@ -121,6 +121,7 @@ genererAiresConstruction	interface_modele.py	/^    def genererAiresConstruction(
 genererIconesTours	interface_modele.py	/^    def genererIconesTours(self):$/;"	m	class:Niveau
 getAngledPoint	helper.py	/^    def getAngledPoint(angle,longueur,cx,cy):$/;"	m	class:Helper
 getAngledPoint	helper.py	/^    getAngledPoint = staticmethod(getAngledPoint)$/;"	v	class:Helper
+horloge	interface_controleur.py	/^    def horloge(self):$/;"	m	class:Controleur
 im	interface_controleur.py	/^import interface_modele as im$/;"	I
 isInside	interface_modele.py	/^    def isInside(self, x, y):$/;"	m	class:Cercle
 isInside	interface_modele.py	/^    def isInside(self, x,y):$/;"	m	class:Rect
