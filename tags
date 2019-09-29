@@ -78,7 +78,7 @@ annulerClicks	interface_controleur.py	/^    def annulerClicks(self):$/;"	m	class
 annulerClicks	interface_vue.py	/^    def annulerClicks(self): #En cas de gameOver si on annule pas le bind on peut continuer à co/;"	m	class:Vue
 attaquerCible	interface_modele.py	/^    def attaquerCible(self):$/;"	m	class:Tour
 attaquerCreeps	interface_modele.py	/^    def attaquerCreeps(self, creep):$/;"	m	class:Niveau
-bougerProjectile	interface_modele.py	/^    def bougerProjectile(self, p):$/;"	m	class:Jeu
+bougerProjectile	interface_modele.py	/^    def bougerProjectile(self, projectile):$/;"	m	class:Jeu
 c	interface_controleur.py	/^    c=Controleur()$/;"	v
 calcAngle	helper.py	/^    calcAngle = staticmethod(calcAngle)$/;"	v	class:Helper
 calcAngle	helper.py	/^    def calcAngle(x1,y1,x2,y2):$/;"	m	class:Helper
@@ -109,6 +109,7 @@ detecterClick	interface_vue.py	/^    def detecterClick(self):$/;"	m	class:Vue
 detecterClickDroit	interface_vue.py	/^    def detecterClickDroit(self):$/;"	m	class:Vue
 disposerEcran	interface_vue.py	/^    def disposerEcran(self, sentier):$/;"	m	class:Vue
 effacerAnimationPrecedente	interface_vue.py	/^    def effacerAnimationPrecedente(self):$/;"	m	class:Vue
+effacerCreep	interface_modele.py	/^    def effacerCreep(self, creep, projectile):$/;"	m	class:Jeu
 effacerDescriptionTour	interface_controleur.py	/^    def effacerDescriptionTour(self):$/;"	m	class:Controleur
 effacerDescriptionTour	interface_vue.py	/^    def effacerDescriptionTour(self):$/;"	m	class:Vue
 effacerNiveau	interface_vue.py	/^    def effacerNiveau(self):$/;"	m	class:Vue

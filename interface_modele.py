@@ -44,21 +44,24 @@ class Jeu():
             for j in i.listProjectiles:
                 self.bougerProjectile(j)
 
-    def bougerProjectile(self, p):
-        p.deplacerProjectile()
-        for c in self.partie.niveau.vague.listCreeps:
-            if p.verifierAtteinteDesCibles(c):
-                if p.type != "pCirculaire":
-                    p.prtTour.listProjectiles.remove(p)
-                p.cible.soustrairePtsVieCreep(p)
-                if p.cible.verifierSiCreepEstMort():
-                    p.cible.transfererValeurCreep()
-                    p.prtTour.prtNiveau.vague.listCreeps.remove(c)
-                    for t in self.partie.niveau.listTours:
-                        if t.cible == p.cible:
-                            t.cible = None
-        if (p.posX > self.largeur or p.posX < 0 or p.posY > self.hauteur or p.posY < 0):
-            p.prtTour.listProjectiles.remove(p)
+    def bougerProjectile(self, projectile):
+        projectile.deplacerProjectile()
+        for creep in self.partie.niveau.vague.listCreeps:
+            if projectile.verifierAtteinteDesCibles(creep):
+                if projectile.type != "pCirculaire":
+                    projectile.prtTour.listProjectiles.remove(projectile)
+                self.effacerCreep(creep, projectile)
+        if (projectile.posX > self.largeur or projectile.posX < 0 or projectile.posY > self.hauteur or projectile.posY < 0):
+            projectile.prtTour.listProjectiles.remove(projectile)
+
+    def effacerCreep(self, creep, projectile):
+        creep.soustrairePtsVieCreep(projectile)
+        if creep.verifierSiCreepEstMort():
+            creep.transfererValeurCreep()
+            projectile.prtTour.prtNiveau.vague.listCreeps.remove(creep)
+            for t in self.partie.niveau.listTours:
+                if t.cible == creep:
+                    t.cible = None
 
     def creerProjectile(self, tour):                
         if tour.type=="TourRoche":
