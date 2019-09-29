@@ -47,8 +47,9 @@ class Jeu():
     def bougerProjectile(self, p):
         p.deplacerProjectile()
         for c in self.partie.niveau.vague.listCreeps:
-            if c.hitBox.isInside(p.posX, p.posY):
-                p.prtTour.listProjectiles.remove(p)
+            if p.verifierAtteinteDesCibles(c):
+                if p.type != "pCirculaire":
+                    p.prtTour.listProjectiles.remove(p)
                 p.cible.soustrairePtsVieCreep(p)
                 if p.cible.verifierSiCreepEstMort():
                     p.cible.transfererValeurCreep()
@@ -400,7 +401,7 @@ class Tour_Feu(Tour):
                             + "\nDommage: " + str(self.puissance) + "\nFréquence: " + str(self.freqAttaque) + "\nCout: " + str(self.cout)
         self.son = "./assets/sounds/tour_feu.wav" 
         self.freqAttaque = 500
-        self.range = 200
+        self.range = 150
         self.puissance = 4
         self.sprite = "./assets/sprites/tour_feu.png"
        
@@ -465,6 +466,8 @@ class Projectile():
         self.puissance = self.prtTour.puissance
         self.pas = 3
         self.cible = self.prtTour.cible
+        self.rayon = 5
+        self.hitBox = Cercle(self.posX - self.rayon / 2, self.posY + self.rayon / 2, self.rayon) 
 
     def calculerDistanceCible(self):
         distance = helper.Helper.calcDistance(self.posX, self.posY, self.cible.positionX, self.cible.positionY)
@@ -495,6 +498,11 @@ class Projectile():
             self.trajectoireY = (+1 * deltaY) 
         else:
             self.trajectoireY = 0
+
+    def verifierAtteinteDesCibles(self, creep):
+        if creep.hitBox.isInside(self.posX, self.posY):
+            return True
+        return False
 
 class Projectile_Roche(Projectile):
     def __init__(self, tour):
@@ -549,11 +557,10 @@ class Projectile_Circulaire(Projectile):
         if self.y1 < self.etendueDommage[3]:
             self.y1 += self.vitesseExplosion
 
-    def verifierAtteinteDesCibles(self):
-        for i in self.prtTour.prtNiveau.vague.listCreeps:
-            if i.positionX >= self.x0 and i.positionX <= self.x1:
-                if i.positionY >= self.y0 and i.positionY <= self.y1:
-                    return True
+    def verifierAtteinteDesCibles(self, creep):
+        if creep.positionX >= self.x0 and creep.positionX <= self.x1:
+            if creep.positionY >= self.y0 and creep.positionY <= self.y1:
+                return True
         return False
 
 class Interface_jeu():
@@ -583,6 +590,13 @@ class Cercle():
         if delta > pow(self.r, 2):
             return False
         return True
+
+    def ifIntersectRect(self, rect):
+        for i in range(rect.x, rect.x + rect.largeur):
+            for j in range(rect.y, rect.y + rect.hauteur):
+                if self.isInside(i, j):
+                    return True
+        return False
 
 class Rect():
     def __init__(self, x, y, largeur, hauteur):

@@ -22,16 +22,13 @@ class Controleur():
         self.dessinerAiresConstruction()
         self.dessinerInterfaceJeu()
         self.dessinerIconesTours()
-        self.horloge()
         self.animer()
 
-    def horloge(self):
+    def animer(self):
         self.msTime += 1
         if self.msTime >= 1000:
             self.msTime = 0
-        self.vue.root.after(1, self.horloge)
 
-    def animer(self):
 #        self.gameOver=self.jeu.partie.verifierGameOver()
 #        if self.gameOver:
 #            self.vue.effacerAnimationPrecedente()

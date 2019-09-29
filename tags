@@ -121,7 +121,7 @@ genererAiresConstruction	interface_modele.py	/^    def genererAiresConstruction(
 genererIconesTours	interface_modele.py	/^    def genererIconesTours(self):$/;"	m	class:Niveau
 getAngledPoint	helper.py	/^    def getAngledPoint(angle,longueur,cx,cy):$/;"	m	class:Helper
 getAngledPoint	helper.py	/^    getAngledPoint = staticmethod(getAngledPoint)$/;"	v	class:Helper
-horloge	interface_controleur.py	/^    def horloge(self):$/;"	m	class:Controleur
+ifIntersectRect	interface_modele.py	/^    def ifIntersectRect(self, rect):$/;"	m	class:Cercle
 im	interface_controleur.py	/^import interface_modele as im$/;"	I
 isInside	interface_modele.py	/^    def isInside(self, x, y):$/;"	m	class:Cercle
 isInside	interface_modele.py	/^    def isInside(self, x,y):$/;"	m	class:Rect
@@ -134,7 +134,8 @@ siCreepDansRange	interface_modele.py	/^    def siCreepDansRange(self, creep):$/;
 soustrairePtsVieCreep	interface_modele.py	/^    def soustrairePtsVieCreep(self, projectile):$/;"	m	class:Creep
 suivreSentier	interface_modele.py	/^    def suivreSentier(self):$/;"	m	class:Creep
 transfererValeurCreep	interface_modele.py	/^    def transfererValeurCreep(self):$/;"	m	class:Creep
-verifierAtteinteDesCibles	interface_modele.py	/^    def verifierAtteinteDesCibles(self):$/;"	m	class:Projectile_Circulaire
+verifierAtteinteDesCibles	interface_modele.py	/^    def verifierAtteinteDesCibles(self, creep):$/;"	m	class:Projectile
+verifierAtteinteDesCibles	interface_modele.py	/^    def verifierAtteinteDesCibles(self, creep):$/;"	m	class:Projectile_Circulaire
 verifierFinNiveau	interface_modele.py	/^    def verifierFinNiveau(self):$/;"	m	class:Partie
 verifierFinSentier	interface_modele.py	/^    def verifierFinSentier(self):$/;"	m	class:Creep
 verifierGameOver	interface_modele.py	/^    def verifierGameOver(self):$/;"	m	class:Partie

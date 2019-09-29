@@ -78,7 +78,7 @@ class Vue():
         for i in jeu.partie.niveau.listTours:
             for j in i.listProjectiles:
                 if j.type == "pCirculaire":
-                    projectile=self.canevasDessin.create_oval(j.x0, j.y0, j.x1, j.y1, fil="red", tags=("projectile"))
+                    projectile=self.canevasDessin.create_oval(j.x0, j.y0, j.x1, j.y1, fil="red", stipple="gray25", tags=("projectile"))
                 else:
                     projectile=self.canevasDessin.create_rectangle(j.posX, j.posY, j.posX+5, j.posY+5, fill=j.couleur, tags=("projectile"))
                 self.projectilesAEffacer.append(projectile)
