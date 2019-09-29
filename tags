@@ -78,7 +78,7 @@ annulerClicks	interface_controleur.py	/^    def annulerClicks(self):$/;"	m	class
 annulerClicks	interface_vue.py	/^    def annulerClicks(self): #En cas de gameOver si on annule pas le bind on peut continuer à co/;"	m	class:Vue
 attaquerCible	interface_modele.py	/^    def attaquerCible(self):$/;"	m	class:Tour
 attaquerCreeps	interface_modele.py	/^    def attaquerCreeps(self, creep):$/;"	m	class:Niveau
-bougerProjectile	interface_modele.py	/^    def bougerProjectile(self, projectile):$/;"	m	class:Jeu
+bougerProjectile	interface_modele.py	/^    def bougerProjectile(self, p):$/;"	m	class:Jeu
 c	interface_controleur.py	/^    c=Controleur()$/;"	v
 calcAngle	helper.py	/^    calcAngle = staticmethod(calcAngle)$/;"	v	class:Helper
 calcAngle	helper.py	/^    def calcAngle(x1,y1,x2,y2):$/;"	m	class:Helper
@@ -133,8 +133,6 @@ siCreepDansRange	interface_modele.py	/^    def siCreepDansRange(self, creep):$/;
 soustrairePtsVieCreep	interface_modele.py	/^    def soustrairePtsVieCreep(self, projectile):$/;"	m	class:Creep
 suivreSentier	interface_modele.py	/^    def suivreSentier(self):$/;"	m	class:Creep
 transfererValeurCreep	interface_modele.py	/^    def transfererValeurCreep(self):$/;"	m	class:Creep
-verifierAtteinteDeLaCible	interface_modele.py	/^    def verifierAtteinteDeLaCible(self):$/;"	m	class:Projectile
-verifierAtteinteDesCibles	interface_modele.py	/^    def verifierAtteinteDesCibles(self):$/;"	m	class:Projectile
 verifierAtteinteDesCibles	interface_modele.py	/^    def verifierAtteinteDesCibles(self):$/;"	m	class:Projectile_Circulaire
 verifierFinNiveau	interface_modele.py	/^    def verifierFinNiveau(self):$/;"	m	class:Partie
 verifierFinSentier	interface_modele.py	/^    def verifierFinSentier(self):$/;"	m	class:Creep

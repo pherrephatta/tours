@@ -26,6 +26,7 @@ class Controleur():
 
     def animer(self):
         self.msTime += 1
+        print(self.msTime)
         if self.msTime >= 1000:
             self.msTime = 0
             self.secTime += 1

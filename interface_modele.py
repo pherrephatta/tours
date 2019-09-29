@@ -20,60 +20,52 @@ class Jeu():
 
     # Recoit appel du controlleur a interval regulier
     def faireAction(self):
-        #TODO: si vague est fini, remettre vague.vagueCree a False
-        # Creer aussi une variable "pret" pour l'usager? i.e. delai de commencement
-        if self.prtControleur.msTime % 200 == 0:
-            self.partie.niveau.vague.listCreeps.append(CreepFacile(self.partie.niveau.vague))
+        if self.partie.niveau.vague.nbCreepsActif < self.partie.niveau.vague.nbCreepsTotal:
+            if self.prtControleur.msTime % 200 == 0:
+                self.partie.niveau.vague.listCreeps.append(CreepDifficile(self.partie.niveau.vague))
+                self.partie.niveau.vague.nbCreepsActif += 1;
         # Faire bouger les creeps
         for i in self.partie.niveau.vague.listCreeps:
-            if self.prtControleur.msTime % i.vitesse == 0:
+            if self.prtControleur.msTime > (i.lastMouvmt + i.vitesse) or self.prtControleur.msTime < i.lastMouvmt:
                 i.suivreSentier()
                 i.verifierFinSentier()
+                i.lastMouvmt = self.prtControleur.msTime
             # Attaquer avec tours
             self.partie.niveau.attaquerCreeps(i)
         # Avancer projectiles
         for i in self.partie.niveau.listTours:
             # Creation de nouveau projectiles
-            if i.cible is not None and (self.prtControleur.msTime % i.freqAttaque) == 0:
-                self.creerProjectile(i)
-                # Les sons ont tendance à s'annuler les uns les autres, puisqu'ils ne se superposent pas
-                #winsound.PlaySound(i.son, winsound.SND_FILENAME | winsound.SND_ASYNC)
-            # Avancer ceux qui existent deja
+            if i.cible is not None:
+                if not i.siCreepDansRange(i.cible):
+                    i.cible = None 
+                elif (self.prtControleur.msTime % i.freqAttaque) == 0:
+                    self.creerProjectile(i)
+                    #winsound.PlaySound(i.son, winsound.SND_FILENAME | winsound.SND_ASYNC)
             for j in i.listProjectiles:
                 self.bougerProjectile(j)
+
+    def bougerProjectile(self, p):
+        p.deplacerProjectile()
+        for c in self.partie.niveau.vague.listCreeps:
+            if c.hitBox.isInside(p.posX, p.posY):
+                p.prtTour.listProjectiles.remove(p)
+                p.cible.soustrairePtsVieCreep(p)
+                if p.cible.verifierSiCreepEstMort():
+                    p.cible.transfererValeurCreep()
+                    p.prtTour.prtNiveau.vague.listCreeps.remove(c)
+                    for t in self.partie.niveau.listTours:
+                        if t.cible == p.cible:
+                            t.cible = None
 
     def creerProjectile(self, tour):                
         if tour.type=="TourRoche":
             tour.listProjectiles.append(Projectile_Roche(tour))
         elif tour.type == "TourFeu":
             tour.listProjectiles.append(Projectile_Circulaire(tour))
-            print("test")
         elif tour.type=="TourCanon":
             tour.listProjectiles.append(Projectile_Canon(tour))   
         elif tour.type=="TourGoo":
             tour.listProjectiles.append(Projectile_Goo(tour))  
-
-    # Appel controleur pour syncMoveProjectile()
-    def bougerProjectile(self, projectile):
-        # Deplacer
-        projectile.deplacerProjectile()
-        # Si le projectile n'a plus de cible
-        # Si le projectile atteint sa cible
-        if projectile.verifierAtteinteDesCibles():
-            projectile.prtTour.listProjectiles.remove(projectile)
-            projectile.cible.soustrairePtsVieCreep(projectile)
-            if projectile.cible.verifierSiCreepEstMort():
-                projectile.cible.transfererValeurCreep()
-                # Retirer creep de la liste du niveau
-                projectile.prtTour.prtNiveau.vague.listCreeps.remove(projectile.prtTour.cible)
-                # Retirer creep des tours
-                for t in self.partie.niveau.listTours:
-                    if t.cible == projectile.cible:
-                        t.cible = None
-        elif projectile.cible is not projectile.prtTour.cible:
-            if projectile.verifierAtteinteDeLaCible():
-                projectile.prtTour.listProjectiles.remove(projectile)
-
 
     # Fonction appelée par le contrôleur lorsque la vue détecte un click gauche de la souris.
     # position = position du curseur de la souris lors du click.
@@ -158,7 +150,6 @@ class Niveau():
             tour = Tour_Canon(self,x,y)
         elif typeTour == "TourGoo":
             tour = Tour_Goo(self,x,y)
-
         #on charge le joueur le coût de la tour
         self.prtPartie.argentJoueur -= tour.cout
         # On ne veut pas que le centre de la tour soit au centre de l'aire de construction. 
@@ -242,6 +233,7 @@ class Creep():
         self.hauteur = 10
         self.hitBox = Rect(self.positionX - self.largeur / 2, self.positionY + self.largeur / 2, self.largeur, self.hauteur) 
         self.son = "./assets/sounds/creep_coin.wav"
+        self.lastMouvmt = 0
 
     def suivreSentier(self):
         self.positionX += self.chVelosite[0]
@@ -460,17 +452,6 @@ class Projectile():
         self.puissance = self.prtTour.puissance
         self.pas = 3
         self.cible = self.prtTour.cible
-
-    def verifierAtteinteDesCibles(self):
-        for i in self.prtTour.prtNiveau.vague.listCreeps:
-            if i.hitBox.isInside(self.posX, self.posY):
-                return True
-        return False
-
-    def verifierAtteinteDeLaCible(self):
-        if (self.cible.hitBox.isInside(self.posX, self.posY)):
-            return True
-        return False
 
     def calculerDistanceCible(self):
         distance = helper.Helper.calcDistance(self.posX, self.posY, self.cible.positionX, self.cible.positionY)

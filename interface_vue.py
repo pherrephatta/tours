@@ -13,7 +13,7 @@ class Vue():
         self.hauteur = hauteur
         self.creepsAEffacer = []
         self.projectilesAEffacer = []
-        self.imgTour = Image.open("./assets/sprites/tour.png")
+
 
     #TODO: Placer les elements dans __init__ (faire reference au meme canevas/cadre)
     def disposerEcran(self, sentier):
@@ -88,6 +88,7 @@ class Vue():
     #TODO: Pour l'instant il n'y a qu'un seul type de tour. Éventuellement chaque type de tour aura sa fonction dessiner
     #TODO: Pour l'instan c'est un rectangle mais on pourra facilement importer des sprites
     def dessinerUneTour(self,tour):
+        self.imgTour = Image.open(tour.sprite)
         imgTour = self.imgTour.resize((int(tour.largeur), int(tour.hauteur)))
         imgTour = ImageTk.PhotoImage(imgTour)
         # l'allocation a un label empeche l'image d'etre effacer par le garbage collector
