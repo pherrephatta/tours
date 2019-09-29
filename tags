@@ -87,14 +87,14 @@ calcDistance	helper.py	/^    def calcDistance(x1,y1,x2,y2):$/;"	m	class:Helper
 calculerDistanceCible	interface_modele.py	/^    def calculerDistanceCible(self):$/;"	m	class:Projectile
 calculerDistanceTourCible	interface_modele.py	/^    def calculerDistanceTourCible(self, creep):$/;"	m	class:Tour
 calculerEtendueDommage	interface_modele.py	/^    def calculerEtendueDommage(self):$/;"	m	class:Projectile_Circulaire
-calculerTrajectoire	interface_modele.py	/^    def calculerTrajectoire(self):$/;"	m	class:Projectile_Roche
+calculerTrajectoire	interface_modele.py	/^    def calculerTrajectoire(self):$/;"	m	class:Projectile
 constructionAnnulee	interface_controleur.py	/^    def constructionAnnulee(self):$/;"	m	class:Controleur
 construireTour	interface_modele.py	/^    def construireTour(self, typeTour, x,y): #x et y sont les coordonnées de l'aire de construct/;"	m	class:Niveau
 creerProjectile	interface_modele.py	/^    def creerProjectile(self, tour):                $/;"	m	class:Jeu
 definirTypeTour	interface_modele.py	/^    def definirTypeTour(self):$/;"	m	class:IconeTour
 definirVecteur	interface_modele.py	/^    def definirVecteur(self):$/;"	m	class:Creep
+deplacerProjectile	interface_modele.py	/^    def deplacerProjectile(self):$/;"	m	class:Projectile
 deplacerProjectile	interface_modele.py	/^    def deplacerProjectile(self):$/;"	m	class:Projectile_Circulaire
-deplacerProjectile	interface_modele.py	/^    def deplacerProjectile(self):$/;"	m	class:Projectile_Roche
 dessinerAires	interface_vue.py	/^    def dessinerAires(self, listAires):$/;"	m	class:Vue
 dessinerAiresConstruction	interface_controleur.py	/^    def dessinerAiresConstruction(self):$/;"	m	class:Controleur
 dessinerIconesTours	interface_controleur.py	/^    def dessinerIconesTours(self):$/;"	m	class:Controleur

@@ -85,6 +85,13 @@ class Vue():
 
     #TODO: Pour l'instant c'est un rectangle mais on pourra facilement importer des sprites
     def dessinerUneAire(self, aire):
+#        imgTour = Image.open(aire.sprite)
+#        imgTour = imgTour.resize((int(aire.largeur), int(aire.hauteur)))
+#        imgTour = ImageTk.PhotoImage(imgTour)
+#        # l'allocation a un label empeche l'image d'etre effacer par le garbage collector
+#        label = Label()
+#        label.image = imgTour
+#        self.canevasDessin.create_image(aire.posX, aire.posY, image=imgTour, anchor=CENTER)
         self.canevasDessin.create_rectangle(aire.posX-aire.largeur,aire.posY-aire.hauteur,aire.posX+aire.largeur,
                                           aire.posY+aire.hauteur,fill=aire.couleur)
 

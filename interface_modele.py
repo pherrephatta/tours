@@ -214,8 +214,9 @@ class AireDeConstruction():
         self.hauteur = 5
         self.posX = x
         self.posY = y
-        self.couleur = "brown"
+        self.couleur = "darkolivegreen"
         self.rect = Rect(self.posX, self.posY, self.largeur,self.hauteur)
+        self.sprite = "./assets/sprites/aire1.png"
 
 #TODO: Evaluer les variables a passer en argument
 #TODO: largeur change avec le type?
@@ -412,6 +413,7 @@ class Tour_Canon(Tour):
         self.description = "Une tour qui lance des boules de canon\nen lignes droites" \
                             + "\nDommage: " + str(self.puissance) + "\nFréquence: " + str(self.freqAttaque) + "\nCout: " + str(self.cout)
         self.son = "./assets/sounds/tour_cannon.wav" 
+        self.sprite = "./assets/sprites/tour_canon.png"
 
 class Tour_Goo(Tour):
     def __init__(self, niveau,x,y):
@@ -422,6 +424,7 @@ class Tour_Goo(Tour):
         self.description = "Une tour qui lance des projectiles gluants\nqui ralentissent leurs cibles" \
                             + "\nDommage: " + str(self.puissance) + "\nFréquence: " + str(self.freqAttaque) + "\nCout: " + str(self.cout)
         self.son = "./assets/sounds/tour_goo.wav" 
+        self.sprite = "./assets/sprites/tour_goo.png"
 
 class IconeTour():
     def __init__(self, niveau, x, y, typeTour):
@@ -467,13 +470,6 @@ class Projectile():
         distance = helper.Helper.calcDistance(self.posX, self.posY, self.cible.positionX, self.cible.positionY)
         return distance
 
-class Projectile_Roche(Projectile):
-    def __init__(self, tour):
-        Projectile.__init__(self, tour)
-        self.couleur = "dim grey"
-        self.calculerTrajectoire()
-        self.type = "pRoche"
-    
     def deplacerProjectile(self):
         self.posX += (self.pas * self.trajectoireX)
         self.posY += (self.pas * self.trajectoireY)
@@ -499,16 +495,25 @@ class Projectile_Roche(Projectile):
             self.trajectoireY = (+1 * deltaY) 
         else:
             self.trajectoireY = 0
-        
+
+class Projectile_Roche(Projectile):
+    def __init__(self, tour):
+        Projectile.__init__(self, tour)
+        self.couleur = "dim grey"
+        self.calculerTrajectoire()
+        self.type = "pRoche"
+    
 class Projectile_Canon(Projectile):
     def __init__(self, tour):
         Projectile.__init__(self, tour)
         self.couleur = "blue"
+        self.type = "pCanon"
 
 class Projectile_Goo(Projectile):
     def __init__(self, tour):
         Projectile.__init__(self, tour)
         self.couleur="dark green"
+        self.type = "pGoo"
 
 class Projectile_Circulaire(Projectile):
     def __init__(self, tour):
