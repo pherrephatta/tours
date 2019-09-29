@@ -384,6 +384,7 @@ class Tour_Roche(Tour):
         self.description = "Une tour qui lance des pierres à l'unité." \
                             + "\nDommage: " + str(self.puissance) + "\nFréquence: " + str(self.freqAttaque) + "\nCout: " + str(self.cout)
         self.son = "./assets/sounds/tour_roche.wav" 
+        self.sprite = "./assets/sprites/tour_roche.png"
 
 class Tour_Feu(Tour):
     def __init__(self, niveau,x,y):
@@ -397,6 +398,7 @@ class Tour_Feu(Tour):
         self.freqAttaque = 500
         self.range = 200
         self.puissance = 4
+        self.sprite = "./assets/sprites/tour_feu.png"
        
 class Tour_Canon(Tour):
     def __init__(self, niveau,x,y):
