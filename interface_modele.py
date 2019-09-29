@@ -22,7 +22,7 @@ class Jeu():
     def faireAction(self):
         if self.partie.niveau.vague.nbCreepsActif < self.partie.niveau.vague.nbCreepsTotal:
             if self.prtControleur.msTime % 200 == 0: #TODO: delai de creation
-                self.partie.niveau.vague.listCreeps.append(CreepDifficile(self.partie.niveau.vague))
+                self.partie.niveau.vague.listCreeps.append(CreepFacile(self.partie.niveau.vague))
                 self.partie.niveau.vague.nbCreepsActif += 1;
         # Faire bouger les creeps
         for i in self.partie.niveau.vague.listCreeps:
@@ -226,7 +226,7 @@ class Creep():
         self.positionY = self.prtVague.prtNiveau.sentier.chemin[0][1]
         self.ptsVie = 3
         self.pas = 1
-        self.vitesse = 5 
+        self.vitesse = 20 
         self.valeur = 10
         self.puissanceDommage = 1
         self.largeur = 10
@@ -311,22 +311,14 @@ class Creep():
                 self.prtVague.listCreeps.remove(self)
                 return True
         return False
-
-class CreepBoss(Creep):
-    def __init__(self, vague):
-        Creep.__init__(self, vague)
-        self.nom = "creepBoss"
-        self.ptsVie = 50
-        self.pas = 2
-        self.valeur = 100
-        self.puissanceDommage = 25
         
 class CreepFacile(Creep):
      def __init__(self,vague):
         Creep.__init__(self, vague)
         self.nom = "creepFacile"
         self.ptsVie = 3 
-        self.pas = 3 
+        self.pas = 2 
+        self.vitesse = 5
         self.valeur = 10 
         self.puissanceDommage = 1 
         
@@ -335,9 +327,20 @@ class CreepDifficile(Creep):
         Creep.__init__(self, vague)
         self.nom = "creepDifficile"
         self.ptsVie = 10 
-        self.pas = 6 
+        self.pas = 1 
+        self.vitesse = 20
         self.valeur = 20 
         self.puissanceDommage = 5 
+
+class CreepBoss(Creep):
+    def __init__(self, vague):
+        Creep.__init__(self, vague)
+        self.nom = "creepBoss"
+        self.ptsVie = 50
+        self.pas = 1
+        self.vitesse = 30
+        self.valeur = 100
+        self.puissanceDommage = 25
 
 class Tour():
     def __init__(self, niveau,x,y):
@@ -450,7 +453,7 @@ class Projectile():
         self.vitesse = 1
         self.couleur = "yellow"    
         self.puissance = self.prtTour.puissance
-        self.pas = 5
+        self.pas = 3
         self.cible = self.prtTour.cible
 
     def calculerDistanceCible(self):
