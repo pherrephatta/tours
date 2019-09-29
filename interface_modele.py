@@ -56,6 +56,8 @@ class Jeu():
                     for t in self.partie.niveau.listTours:
                         if t.cible == p.cible:
                             t.cible = None
+        if (p.posX > self.largeur or p.posX < 0 or p.posY > self.hauteur or p.posY < 0):
+            p.prtTour.listProjectiles.remove(p)
 
     def creerProjectile(self, tour):                
         if tour.type=="TourRoche":
@@ -394,7 +396,7 @@ class Tour_Feu(Tour):
         self.son = "./assets/sounds/tour_feu.wav" 
         self.freqAttaque = 500
         self.range = 200
-        self.puissance = 3
+        self.puissance = 4
        
 class Tour_Canon(Tour):
     def __init__(self, niveau,x,y):
