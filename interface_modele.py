@@ -20,10 +20,10 @@ class Jeu():
 
     # Recoit appel du controlleur a interval regulier
     def faireAction(self):
-        if self.partie.niveau.vague.nbCreepsActif < self.partie.niveau.vague.nbCreepsTotal:
-            if self.prtControleur.msTime % 200 == 0: #TODO: delai de creation
-                self.partie.niveau.vague.listCreeps.append(CreepFacile(self.partie.niveau.vague))
-                self.partie.niveau.vague.nbCreepsActif += 1;
+#        if self.partie.niveau.vague.nbCreepsActif < self.partie.niveau.vague.nbCreepsTotal:
+        if self.prtControleur.msTime % 200 == 0: #TODO: delai de creation
+            self.partie.niveau.vague.listCreeps.append(CreepFacile(self.partie.niveau.vague))
+            self.partie.niveau.vague.nbCreepsActif += 1;
         # Faire bouger les creeps
         for i in self.partie.niveau.vague.listCreeps:
             if self.prtControleur.msTime > (i.lastMouvmt + i.vitesse) or self.prtControleur.msTime < i.lastMouvmt:
@@ -234,8 +234,9 @@ class Creep():
         self.largeur = 10
         self.hauteur = 10
         self.hitBox = Rect(self.positionX - self.largeur / 2, self.positionY + self.largeur / 2, self.largeur, self.hauteur) 
-        self.son = "./assets/sounds/creep_coin.wav"
         self.lastMouvmt = 0
+        self.son = "./assets/sounds/creep_coin.wav"
+        self.sprite = "./assets/sprites/creep1.png"
 
     def suivreSentier(self):
         self.positionX += self.chVelosite[0]
@@ -323,6 +324,8 @@ class CreepFacile(Creep):
         self.vitesse = 5
         self.valeur = 10 
         self.puissanceDommage = 1 
+        self.largeur = 30
+        self.hauteur = 15
         
 class CreepDifficile(Creep):
      def __init__(self,vague):

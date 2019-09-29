@@ -14,7 +14,6 @@ class Vue():
         self.creepsAEffacer = []
         self.projectilesAEffacer = []
 
-
     #TODO: Placer les elements dans __init__ (faire reference au meme canevas/cadre)
     def disposerEcran(self, sentier):
         self.cadreMenu = Frame(self.root, bg="grey",width=self.largeur, height=self.hauteur)
@@ -48,14 +47,23 @@ class Vue():
 
     def afficherCreeps(self, vague):
         for i in vague.listCreeps:
-            #TODO: generaliser
-            if i.nom == "creepFacile":
-                creep = self.canevasDessin.create_oval(i.positionX, i.positionY, i.positionX+i.largeur, i.positionY+i.hauteur, fill = "pink", tags = ("creep"))
-            elif i.nom == "creepDifficile":
-                creep = self.canevasDessin.create_oval(i.positionX, i.positionY, i.positionX+i.largeur, i.positionY+i.hauteur, fill = "yellow", tags = ("creep"))
-            elif i.nom == "creepBoss":
-                creep = self.canevasDessin.create_oval(i.positionX, i.positionY, i.positionX+i.largeur, i.positionY+i.hauteur, fill = "red", tags = ("creep"))
+            imgCreep = Image.open(i.sprite)
+            imgCreep = imgCreep.resize((int(i.largeur), int(i.hauteur)))
+            imgCreep = ImageTk.PhotoImage(imgCreep)
+            # l'allocation a un label empeche l'image d'etre effacer par le garbage collector
+            label = Label()
+            label.image = imgCreep 
+            creep = self.canevasDessin.create_image((i.positionX, i.positionY), image=imgCreep, anchor=CENTER, tags=("creep"))
             self.creepsAEffacer.append(creep)
+
+            #TODO: generaliser
+#            if i.nom == "creepFacile":
+#                creep = self.canevasDessin.create_oval(i.positionX, i.positionY, i.positionX+i.largeur, i.positionY+i.hauteur, fill = "pink", tags = ("creep"))
+#            elif i.nom == "creepDifficile":
+#                creep = self.canevasDessin.create_oval(i.positionX, i.positionY, i.positionX+i.largeur, i.positionY+i.hauteur, fill = "yellow", tags = ("creep"))
+#            elif i.nom == "creepBoss":
+#                creep = self.canevasDessin.create_oval(i.positionX, i.positionY, i.positionX+i.largeur, i.positionY+i.hauteur, fill = "red", tags = ("creep"))
+#            self.creepsAEffacer.append(creep)
 
     def effacerAnimationPrecedente(self):
         for i in self.creepsAEffacer:
@@ -88,8 +96,8 @@ class Vue():
     #TODO: Pour l'instant il n'y a qu'un seul type de tour. Éventuellement chaque type de tour aura sa fonction dessiner
     #TODO: Pour l'instan c'est un rectangle mais on pourra facilement importer des sprites
     def dessinerUneTour(self,tour):
-        self.imgTour = Image.open(tour.sprite)
-        imgTour = self.imgTour.resize((int(tour.largeur), int(tour.hauteur)))
+        imgTour = Image.open(tour.sprite)
+        imgTour = imgTour.resize((int(tour.largeur), int(tour.hauteur)))
         imgTour = ImageTk.PhotoImage(imgTour)
         # l'allocation a un label empeche l'image d'etre effacer par le garbage collector
         label = Label()
