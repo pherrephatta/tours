@@ -315,7 +315,7 @@ class CreepDifficile(Creep):
         self.type = "creepDifficile"
         self.ptsVie = 10 
         self.pas = 1 
-        self.vitesse = 1
+        self.vitesse = 20
         self.valeur = 20 
         self.puissanceDommage = 5 
 
