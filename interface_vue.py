@@ -2,8 +2,6 @@
 # -*- coding: iso-8859-1 -*-
 
 from tkinter import *
-from PIL import Image, ImageTk
-from test.test_importlib.namespace_pkgs.project1 import parent
 
 class Vue():
     def __init__(self, controleur, largeur, hauteur):
@@ -13,6 +11,19 @@ class Vue():
         self.hauteur = hauteur
         self.creepsAEffacer = []
         self.projectilesAEffacer = []
+
+        self.imgCreep1 = PhotoImage(file="./assets/sprites/creep1.gif")
+        self.imgCreep2 = PhotoImage(file="./assets/sprites/creep2.gif")
+
+        self.imgTourRoche = PhotoImage(file="./assets/sprites/tour_roche.gif")
+        self.imgTourFeu = PhotoImage(file="./assets/sprites/tour_feu.gif")
+        self.imgTourGoo = PhotoImage(file="./assets/sprites/tour_goo.gif")
+        self.imgTourCanon = PhotoImage(file="./assets/sprites/tour_canon.gif")
+
+        self.icoTourRoche = PhotoImage(file="./assets/sprites/ico_tour_roche.gif")
+        self.icoTourFeu = PhotoImage(file="./assets/sprites/ico_tour_feu.gif")
+        self.icoTourGoo = PhotoImage(file="./assets/sprites/ico_tour_goo.gif")
+        self.icoTourCanon = PhotoImage(file="./assets/sprites/ico_tour_canon.gif")
 
     #TODO: Placer les elements dans __init__ (faire reference au meme canevas/cadre)
     def disposerEcran(self, sentier):
@@ -46,14 +57,17 @@ class Vue():
         self.canevasDessin.create_rectangle(pX1, pY1, pX2, pY2, fill="blue", tags=("portail"))
 
     def afficherCreeps(self, vague):
-        for i in vague.listCreeps:
-            imgCreep = Image.open(i.sprite)
-            imgCreep = imgCreep.resize((int(i.largeur), int(i.hauteur)))
-            imgCreep = ImageTk.PhotoImage(imgCreep)
-            # l'allocation a un label empeche l'image d'etre effacer par le garbage collector
-            label = Label()
-            label.image = imgCreep 
-            creep = self.canevasDessin.create_image((i.positionX, i.positionY), image=imgCreep, anchor=CENTER, tags=("creep"))
+        for c in vague.listCreeps:
+            if c.type == "creepFacile":
+                imgCreep = self.imgCreep1
+            elif c.type == "creepDifficile":
+                imgCreep = self.imgCreep2
+            else:
+                imgCreep = self.imgCreep1
+
+#            label = Label()
+#            label.image = imgCreep 
+            creep = self.canevasDessin.create_image((c.positionX, c.positionY), image=imgCreep, anchor=CENTER, tags=("creep"))
             self.creepsAEffacer.append(creep)
 
             #TODO: generaliser
@@ -85,13 +99,6 @@ class Vue():
 
     #TODO: Pour l'instant c'est un rectangle mais on pourra facilement importer des sprites
     def dessinerUneAire(self, aire):
-#        imgTour = Image.open(aire.sprite)
-#        imgTour = imgTour.resize((int(aire.largeur), int(aire.hauteur)))
-#        imgTour = ImageTk.PhotoImage(imgTour)
-#        # l'allocation a un label empeche l'image d'etre effacer par le garbage collector
-#        label = Label()
-#        label.image = imgTour
-#        self.canevasDessin.create_image(aire.posX, aire.posY, image=imgTour, anchor=CENTER)
         self.canevasDessin.create_rectangle(aire.posX-aire.largeur,aire.posY-aire.hauteur,aire.posX+aire.largeur,
                                           aire.posY+aire.hauteur,fill=aire.couleur)
 
@@ -102,13 +109,18 @@ class Vue():
 
     #TODO: Pour l'instant il n'y a qu'un seul type de tour. Éventuellement chaque type de tour aura sa fonction dessiner
     #TODO: Pour l'instan c'est un rectangle mais on pourra facilement importer des sprites
-    def dessinerUneTour(self,tour):
-        imgTour = Image.open(tour.sprite)
-        imgTour = imgTour.resize((int(tour.largeur), int(tour.hauteur)))
-        imgTour = ImageTk.PhotoImage(imgTour)
-        # l'allocation a un label empeche l'image d'etre effacer par le garbage collector
-        label = Label()
-        label.image = imgTour
+    def dessinerUneTour(self, tour):
+        if tour.type == "TourFeu":
+            imgTour = self.imgTourFeu
+        elif tour.type == "TourRoche":
+            imgTour = self.imgTourRoche
+        elif tour.type == "TourGoo":
+            imgTour = self.imgTourGoo
+        elif tour.type == "TourCanon":
+            imgTour = self.imgTourCanon
+        else:
+            imgTour = self.imgTourRoche
+
         self.canevasDessin.create_image(tour.posX, tour.posY, image=imgTour, anchor=CENTER)
 #        self.canevasDessin.create_rectangle(tour.posX-tour.largeur,tour.posY-tour.hauteur,tour.posX+tour.largeur,
  #                                         tour.posY+tour.hauteur,fill=tour.couleur, tags=('IconeTour'))
@@ -123,7 +135,19 @@ class Vue():
         self.canevasDessin.create_rectangle(iconeTour.posX-iconeTour.largeur,iconeTour.posY-iconeTour.hauteur,
                                       iconeTour.posX+iconeTour.largeur, iconeTour.posY+iconeTour.hauteur,
                                       fill="grey")
-        self.dessinerUneTour(iconeTour.tour)
+
+        if iconeTour.tour.type == "TourFeu":
+            imgTour = self.icoTourFeu
+        elif iconeTour.tour.type == "TourRoche":
+            imgTour = self.icoTourRoche
+        elif iconeTour.tour.type == "TourGoo":
+            imgTour = self.icoTourGoo
+        elif iconeTour.tour.type == "TourCanon":
+            imgTour = self.icoTourCanon
+        else:
+            imgTour = self.icoTourRoche
+
+        self.canevasDessin.create_image(iconeTour.posX, iconeTour.posY, image=imgTour, anchor=CENTER)
 
     #Dessine toutes les icones de tour d'un aire de jeu. Éventuellement ce sera selon le type choisi.
     def dessinerIconesTours(self, listIconesTours):

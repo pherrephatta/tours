@@ -20,10 +20,10 @@ class Jeu():
 
     # Recoit appel du controlleur a interval regulier
     def faireAction(self):
-#        if self.partie.niveau.vague.nbCreepsActif < self.partie.niveau.vague.nbCreepsTotal:
-        if self.prtControleur.msTime % 200 == 0: #TODO: delai de creation
-            self.partie.niveau.vague.listCreeps.append(CreepFacile(self.partie.niveau.vague))
-            self.partie.niveau.vague.nbCreepsActif += 1;
+        if self.partie.niveau.vague.nbCreepsActif < self.partie.niveau.vague.nbCreepsTotal:
+            if self.prtControleur.msTime % 1000 == 0: #TODO: delai de creation
+                self.partie.niveau.vague.listCreeps.append(CreepDifficile(self.partie.niveau.vague))
+                self.partie.niveau.vague.nbCreepsActif += 1;
         # Faire bouger les creeps
         for i in self.partie.niveau.vague.listCreeps:
             if self.prtControleur.msTime > (i.lastMouvmt + i.vitesse) or self.prtControleur.msTime < i.lastMouvmt:
@@ -39,39 +39,10 @@ class Jeu():
                 if not i.siCreepDansRange(i.cible):
                     i.cible = None 
                 elif (self.prtControleur.msTime % i.freqAttaque) == 0:
-                    self.creerProjectile(i)
+                    i.creerProjectile()
                     #winsound.PlaySound(i.son, winsound.SND_FILENAME | winsound.SND_ASYNC)
             for j in i.listProjectiles:
-                self.bougerProjectile(j)
-
-    def bougerProjectile(self, projectile):
-        projectile.deplacerProjectile()
-        for creep in self.partie.niveau.vague.listCreeps:
-            if projectile.verifierAtteinteDesCibles(creep):
-                if projectile.type != "pCirculaire":
-                    projectile.prtTour.listProjectiles.remove(projectile)
-                self.effacerCreep(creep, projectile)
-        if (projectile.posX > self.largeur or projectile.posX < 0 or projectile.posY > self.hauteur or projectile.posY < 0):
-            projectile.prtTour.listProjectiles.remove(projectile)
-
-    def effacerCreep(self, creep, projectile):
-        creep.soustrairePtsVieCreep(projectile)
-        if creep.verifierSiCreepEstMort():
-            creep.transfererValeurCreep()
-            projectile.prtTour.prtNiveau.vague.listCreeps.remove(creep)
-            for t in self.partie.niveau.listTours:
-                if t.cible == creep:
-                    t.cible = None
-
-    def creerProjectile(self, tour):                
-        if tour.type=="TourRoche":
-            tour.listProjectiles.append(Projectile_Roche(tour))
-        elif tour.type == "TourFeu":
-            tour.listProjectiles.append(Projectile_Circulaire(tour))
-        elif tour.type=="TourCanon":
-            tour.listProjectiles.append(Projectile_Canon(tour))   
-        elif tour.type=="TourGoo":
-            tour.listProjectiles.append(Projectile_Goo(tour))  
+                j.bougerProjectile()
 
     # Fonction appelée par le contrôleur lorsque la vue détecte un click gauche de la souris.
     # position = position du curseur de la souris lors du click.
@@ -140,6 +111,7 @@ class Niveau():
         self.listIconesTours = [] # Les icones pour chaque tour
         #self.sentier = Sentier(self)
         self.sentier = Sentier2(self) #TODO: Implementation de vagues
+
         self.vague = Vague(self, 5)
         self.genererAiresConstruction()
         self.genererIconesTours()
@@ -220,7 +192,6 @@ class AireDeConstruction():
         self.posY = y
         self.couleur = "darkolivegreen"
         self.rect = Rect(self.posX, self.posY, self.largeur,self.hauteur)
-        self.sprite = "./assets/sprites/aire1.png"
 
 #TODO: Evaluer les variables a passer en argument
 #TODO: largeur change avec le type?
@@ -236,12 +207,11 @@ class Creep():
         self.vitesse = 20 
         self.valeur = 10
         self.puissanceDommage = 1
-        self.largeur = 10
-        self.hauteur = 10
+        self.largeur = 30 
+        self.hauteur = 15
         self.hitBox = Rect(self.positionX - self.largeur / 2, self.positionY + self.largeur / 2, self.largeur, self.hauteur) 
         self.lastMouvmt = 0
         self.son = "./assets/sounds/creep_coin.wav"
-        self.sprite = "./assets/sprites/creep1.png"
 
     def suivreSentier(self):
         self.positionX += self.chVelosite[0]
@@ -319,33 +289,40 @@ class Creep():
                 self.prtVague.listCreeps.remove(self)
                 return True
         return False
+
+    def effacerCreep(self, projectile):
+        self.soustrairePtsVieCreep(projectile)
+        if self.verifierSiCreepEstMort():
+            self.transfererValeurCreep()
+            self.prtVague.listCreeps.remove(self)
+            for t in self.prtVague.prtNiveau.listTours:
+                if t.cible == self:
+                    t.cible = None
         
 class CreepFacile(Creep):
      def __init__(self,vague):
         Creep.__init__(self, vague)
-        self.nom = "creepFacile"
+        self.type = "creepFacile"
         self.ptsVie = 3 
         self.pas = 2 
         self.vitesse = 5
         self.valeur = 10 
         self.puissanceDommage = 1 
-        self.largeur = 30
-        self.hauteur = 15
         
 class CreepDifficile(Creep):
      def __init__(self,vague):
         Creep.__init__(self, vague)
-        self.nom = "creepDifficile"
+        self.type = "creepDifficile"
         self.ptsVie = 10 
         self.pas = 1 
-        self.vitesse = 20
+        self.vitesse = 1
         self.valeur = 20 
         self.puissanceDommage = 5 
 
 class CreepBoss(Creep):
     def __init__(self, vague):
         Creep.__init__(self, vague)
-        self.nom = "creepBoss"
+        self.type = "creepBoss"
         self.ptsVie = 50
         self.pas = 1
         self.vitesse = 30
@@ -368,7 +345,6 @@ class Tour():
         self.puissance = 1
         self.cout = 100
         self.sonConstruction = "./assets/sounds/tour_construction.wav"
-        self.sprite = "./assets/sprites/tour.png"
 
     def siCreepDansRange(self, creep):
         if abs(self.posX - creep.positionX) < self.range:
@@ -392,7 +368,9 @@ class Tour_Roche(Tour):
         self.description = "Une tour qui lance des pierres à l'unité." \
                             + "\nDommage: " + str(self.puissance) + "\nFréquence: " + str(self.freqAttaque) + "\nCout: " + str(self.cout)
         self.son = "./assets/sounds/tour_roche.wav" 
-        self.sprite = "./assets/sprites/tour_roche.png"
+
+    def creerProjectile(self):                
+        self.listProjectiles.append(Projectile_Roche(self))
 
 class Tour_Feu(Tour):
     def __init__(self, niveau,x,y):
@@ -406,7 +384,9 @@ class Tour_Feu(Tour):
         self.freqAttaque = 500
         self.range = 150
         self.puissance = 4
-        self.sprite = "./assets/sprites/tour_feu.png"
+
+    def creerProjectile(self):                
+        self.listProjectiles.append(Projectile_Circulaire(self))
        
 class Tour_Canon(Tour):
     def __init__(self, niveau,x,y):
@@ -417,7 +397,9 @@ class Tour_Canon(Tour):
         self.description = "Une tour qui lance des boules de canon\nen lignes droites" \
                             + "\nDommage: " + str(self.puissance) + "\nFréquence: " + str(self.freqAttaque) + "\nCout: " + str(self.cout)
         self.son = "./assets/sounds/tour_cannon.wav" 
-        self.sprite = "./assets/sprites/tour_canon.png"
+
+    def creerProjectile(self):                
+        self.listProjectiles.append(Projectile_Canon(self))
 
 class Tour_Goo(Tour):
     def __init__(self, niveau,x,y):
@@ -428,7 +410,9 @@ class Tour_Goo(Tour):
         self.description = "Une tour qui lance des projectiles gluants\nqui ralentissent leurs cibles" \
                             + "\nDommage: " + str(self.puissance) + "\nFréquence: " + str(self.freqAttaque) + "\nCout: " + str(self.cout)
         self.son = "./assets/sounds/tour_goo.wav" 
-        self.sprite = "./assets/sprites/tour_goo.png"
+
+    def creerProjectile(self):                
+        self.listProjectiles.append(Projectile_Goo(self))
 
 class IconeTour():
     def __init__(self, niveau, x, y, typeTour):
@@ -506,6 +490,16 @@ class Projectile():
         if creep.hitBox.isInside(self.posX, self.posY):
             return True
         return False
+
+    def bougerProjectile(self):
+        self.deplacerProjectile()
+        for creep in self.prtTour.prtNiveau.vague.listCreeps:
+            if self.verifierAtteinteDesCibles(creep):
+                if self.type != "pCirculaire":
+                    self.prtTour.listProjectiles.remove(self)
+                creep.effacerCreep(self)
+        if (self.posX > self.prtTour.prtNiveau.prtPartie.prtJeu.largeur or self.posX < 0 or self.posY > self.prtTour.prtNiveau.prtPartie.prtJeu.hauteur or self.posY < 0):
+            self.prtTour.listProjectiles.remove(self)
 
 class Projectile_Roche(Projectile):
     def __init__(self, tour):
