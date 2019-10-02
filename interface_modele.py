@@ -212,6 +212,7 @@ class Creep():
         self.hitBox = Rect(self.positionX - self.largeur / 2, self.positionY + self.largeur / 2, self.largeur, self.hauteur) 
         self.lastMouvmt = 0
         self.son = "./assets/sounds/creep_coin.wav"
+        self.ptsVieInit = self.ptsVie
 
     def suivreSentier(self):
         self.positionX += self.chVelosite[0]
@@ -304,6 +305,7 @@ class CreepFacile(Creep):
         Creep.__init__(self, vague)
         self.type = "creepFacile"
         self.ptsVie = 3 
+        self.ptsVieInit = self.ptsVie
         self.pas = 2 
         self.vitesse = 5
         self.valeur = 10 
@@ -314,8 +316,9 @@ class CreepDifficile(Creep):
         Creep.__init__(self, vague)
         self.type = "creepDifficile"
         self.ptsVie = 10 
+        self.ptsVieInit = self.ptsVie
         self.pas = 1 
-        self.vitesse = 20
+        self.vitesse = 10
         self.valeur = 20 
         self.puissanceDommage = 5 
 
@@ -324,8 +327,9 @@ class CreepBoss(Creep):
         Creep.__init__(self, vague)
         self.type = "creepBoss"
         self.ptsVie = 50
+        self.ptsVieInit = self.ptsVie
         self.pas = 1
-        self.vitesse = 30
+        self.vitesse = 15
         self.valeur = 100
         self.puissanceDommage = 25
 

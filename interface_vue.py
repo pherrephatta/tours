@@ -25,6 +25,9 @@ class Vue():
         self.icoTourGoo = PhotoImage(file="./assets/sprites/ico_tour_goo.gif")
         self.icoTourCanon = PhotoImage(file="./assets/sprites/ico_tour_canon.gif")
 
+        self.imgPortail = PhotoImage(file="./assets/sprites/portail_citrouille.gif")
+        self.imgBackground = PhotoImage(file="./assets/sprites/bg_grass.gif")
+
     #TODO: Placer les elements dans __init__ (faire reference au meme canevas/cadre)
     def disposerEcran(self, sentier):
         self.cadreMenu = Frame(self.root, bg="grey",width=self.largeur, height=self.hauteur)
@@ -34,6 +37,7 @@ class Vue():
         self.cadreDessin.pack()
 
         self.canevasDessin = Canvas(self.cadreDessin,width=self.largeur, height=self.hauteur, bg="green")
+        self.canevasDessin.create_image((0,0), image=self.imgBackground, anchor=NW)
         self.canevasDessin.create_line(sentier.chemin, width=sentier.largeur, fill=sentier.couleur)
         self.canevasDessin.pack()
 
@@ -45,16 +49,12 @@ class Vue():
 
         ###### PORTAIL #######
         indiceCheminSentier = len(sentier.chemin) - 1
-        largeurPortail = 70
-        hauteurPortail = 70
+        largeurPortail = 75
+        hauteurPortail = 75
         #Calcul coordonnées portail
-        pX1 = sentier.chemin[indiceCheminSentier][0] - (largeurPortail/2)
-        pX2 = sentier.chemin[indiceCheminSentier][0] + (largeurPortail/2)
+        pX1 = sentier.chemin[indiceCheminSentier][0] - (largeurPortail)
         pY1 = sentier.chemin[indiceCheminSentier][1] - (hauteurPortail/2)
-        pY2 = sentier.chemin[indiceCheminSentier][1] + (hauteurPortail/2)
-        #print(pX1)
-        #input("test")
-        self.canevasDessin.create_rectangle(pX1, pY1, pX2, pY2, fill="blue", tags=("portail"))
+        self.canevasDessin.create_image((pX1, pY1), image=self.imgPortail, anchor=NW, tags=("portail"))
 
     def afficherCreeps(self, vague):
         for c in vague.listCreeps:
@@ -69,15 +69,17 @@ class Vue():
 #            label.image = imgCreep 
             creep = self.canevasDessin.create_image((c.positionX, c.positionY), image=imgCreep, anchor=CENTER, tags=("creep"))
             self.creepsAEffacer.append(creep)
+            self.afficherDommageCreep(c)
 
-            #TODO: generaliser
-#            if i.nom == "creepFacile":
-#                creep = self.canevasDessin.create_oval(i.positionX, i.positionY, i.positionX+i.largeur, i.positionY+i.hauteur, fill = "pink", tags = ("creep"))
-#            elif i.nom == "creepDifficile":
-#                creep = self.canevasDessin.create_oval(i.positionX, i.positionY, i.positionX+i.largeur, i.positionY+i.hauteur, fill = "yellow", tags = ("creep"))
-#            elif i.nom == "creepBoss":
-#                creep = self.canevasDessin.create_oval(i.positionX, i.positionY, i.positionX+i.largeur, i.positionY+i.hauteur, fill = "red", tags = ("creep"))
-#            self.creepsAEffacer.append(creep)
+    def afficherDommageCreep(self, creep):
+        couleur = None
+        if creep.ptsVie > (creep.ptsVieInit / 2):
+            couleur = "green"
+        elif creep.ptsVie <= (creep.ptsVieInit / 2) and creep.ptsVie > 1:
+            couleur = "yellow"
+        else:
+            couleur = "red"
+        dommage=self.canevasDessin.create_rectangle(creep.positionX - creep.largeur/2, creep.positionY-5, creep.positionX + creep.largeur, creep.positionY-10, fill=couleur, tags=("dommage"))
 
     def effacerAnimationPrecedente(self):
         for i in self.creepsAEffacer:
@@ -86,7 +88,7 @@ class Vue():
         for j in self.projectilesAEffacer:
             self.canevasDessin.delete(j)
         self.projectilesAEffacer.clear()
-        self.canevasDessin.delete("argent", "ptsVie")
+        self.canevasDessin.delete("argent", "ptsVie", "dommage")
 
     def afficherProjectiles(self, jeu):
         for i in jeu.partie.niveau.listTours:
