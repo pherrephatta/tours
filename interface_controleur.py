@@ -25,6 +25,7 @@ class Controleur():
         self.animer()
 
     def animer(self):
+        #TODO: Mettre les 
         self.msTime += 1
         if self.msTime >= 1000:
             self.msTime = 0
@@ -39,12 +40,14 @@ class Controleur():
 #            self.vue.effacerNiveau()
 #            self.vue.disposerEcran(self.jeu.partie.niveau.sentier)
 #        else: 
+
         self.vue.effacerAnimationPrecedente()
         self.jeu.faireAction()
         self.vue.afficherCreeps(self.jeu.partie.niveau.vague)
         self.vue.afficherProjectiles(self.jeu)
         self.vue.afficherStats(self.jeu.partie.argentJoueur, self.jeu.partie.ptsVieJoueur)
         self.vue.root.after(1, self.animer)
+
 #        self.finNiveau=self.jeu.partie.verifierFinNiveau()
 
     #Lorsque la vue détecte un "click gauche de la souris" elle appelle cette fonction afin que le contrôleur

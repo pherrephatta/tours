@@ -1,4 +1,3 @@
-
 # -*- coding: iso-8859-1 -*-
 
 from tkinter import *
@@ -47,14 +46,18 @@ class Vue():
         self.boutonQuitter=Button(self.cadreMenu,text="Quitter",command=self.root.quit,bg="grey",fg="red")
         self.boutonQuitter.pack(side=RIGHT)
 
-        ###### PORTAIL #######
+        # Portail
         indiceCheminSentier = len(sentier.chemin) - 1
         largeurPortail = 75
         hauteurPortail = 75
+        pX1 = sentier.chemin[indiceCheminSentier][0]
+        pY1 = sentier.chemin[indiceCheminSentier][1]
         #Calcul coordonnées portail
-        pX1 = sentier.chemin[indiceCheminSentier][0] - (largeurPortail)
-        pY1 = sentier.chemin[indiceCheminSentier][1] - (hauteurPortail/2)
-        self.canevasDessin.create_image((pX1, pY1), image=self.imgPortail, anchor=NW, tags=("portail"))
+        if sentier.axe == 'Y':
+            pY1 += hauteurPortail/3
+        else:
+            pX1 -= largeurPortail/3
+        self.canevasDessin.create_image((pX1, pY1), image=self.imgPortail, anchor=CENTER, tags=("portail"))
 
     def afficherCreeps(self, vague):
         for c in vague.listCreeps:
@@ -65,8 +68,6 @@ class Vue():
             else:
                 imgCreep = self.imgCreep1
 
-#            label = Label()
-#            label.image = imgCreep 
             creep = self.canevasDessin.create_image((c.positionX, c.positionY), image=imgCreep, anchor=CENTER, tags=("creep"))
             self.creepsAEffacer.append(creep)
             self.afficherDommageCreep(c)
@@ -79,7 +80,7 @@ class Vue():
             couleur = "yellow"
         else:
             couleur = "red"
-        dommage=self.canevasDessin.create_rectangle(creep.positionX - creep.largeur/2, creep.positionY-5, creep.positionX + creep.largeur, creep.positionY-10, fill=couleur, tags=("dommage"))
+        dommage=self.canevasDessin.create_rectangle(creep.positionX - creep.largeur/2, creep.positionY-10, creep.positionX + creep.largeur, creep.positionY-15, fill=couleur, tags=("dommage"))
 
     def effacerAnimationPrecedente(self):
         for i in self.creepsAEffacer:
@@ -99,7 +100,6 @@ class Vue():
                     projectile=self.canevasDessin.create_rectangle(j.posX, j.posY, j.posX+5, j.posY+5, fill=j.couleur, tags=("projectile"))
                 self.projectilesAEffacer.append(projectile)
 
-    #TODO: Pour l'instant c'est un rectangle mais on pourra facilement importer des sprites
     def dessinerUneAire(self, aire):
         self.canevasDessin.create_rectangle(aire.posX-aire.largeur,aire.posY-aire.hauteur,aire.posX+aire.largeur,
                                           aire.posY+aire.hauteur,fill=aire.couleur)
@@ -109,8 +109,6 @@ class Vue():
         for i in listAires:
             self.dessinerUneAire(i)
 
-    #TODO: Pour l'instant il n'y a qu'un seul type de tour. Éventuellement chaque type de tour aura sa fonction dessiner
-    #TODO: Pour l'instan c'est un rectangle mais on pourra facilement importer des sprites
     def dessinerUneTour(self, tour):
         if tour.type == "TourFeu":
             imgTour = self.imgTourFeu
@@ -124,15 +122,11 @@ class Vue():
             imgTour = self.imgTourRoche
 
         self.canevasDessin.create_image(tour.posX, tour.posY, image=imgTour, anchor=CENTER)
-#        self.canevasDessin.create_rectangle(tour.posX-tour.largeur,tour.posY-tour.hauteur,tour.posX+tour.largeur,
- #                                         tour.posY+tour.hauteur,fill=tour.couleur, tags=('IconeTour'))
 
     #Dessine toutes les tours d'un aire de jeu. Éventuellement ce sera selon le type choisi.
     def dessinerTour(self, tour):
         self.dessinerUneTour(tour)
 
-    #TODO: Pour l'instant il n'y a qu'un seul type d'icone de tour. Éventuellement chaque type de tour aura sa fonction dessiner
-    #TODO: Pour l'instant c'est un rectangle mais on pourra facilement importer des sprites
     def dessinerUneIconeTour(self,iconeTour):
         self.canevasDessin.create_rectangle(iconeTour.posX-iconeTour.largeur,iconeTour.posY-iconeTour.hauteur,
                                       iconeTour.posX+iconeTour.largeur, iconeTour.posY+iconeTour.hauteur,
