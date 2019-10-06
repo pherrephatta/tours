@@ -24,8 +24,8 @@ Projectile_Circulaire	interface_modele.py	/^class Projectile_Circulaire(Projecti
 Projectile_Goo	interface_modele.py	/^class Projectile_Goo(Projectile):$/;"	c
 Projectile_Roche	interface_modele.py	/^class Projectile_Roche(Projectile):$/;"	c
 Rect	interface_modele.py	/^class Rect():$/;"	c
-Sentier	interface_modele.py	/^class Sentier():$/;"	c
-Sentier2	interface_modele.py	/^class Sentier2():$/;"	c
+SentierN1	interface_modele.py	/^class SentierN1():$/;"	c
+SentierN2	interface_modele.py	/^class SentierN2():$/;"	c
 Tour	interface_modele.py	/^class Tour():$/;"	c
 Tour_Canon	interface_modele.py	/^class Tour_Canon(Tour):$/;"	c
 Tour_Feu	interface_modele.py	/^class Tour_Feu(Tour):$/;"	c
@@ -41,9 +41,9 @@ __init__	interface_modele.py	/^    def __init__(self):$/;"	m	class:Interface_jeu
 __init__	interface_modele.py	/^    def __init__(self):$/;"	m	class:Zone_description
 __init__	interface_modele.py	/^    def __init__(self, controleur, largeur=800, hauteur=600):$/;"	m	class:Jeu
 __init__	interface_modele.py	/^    def __init__(self, jeu):$/;"	m	class:Partie
-__init__	interface_modele.py	/^    def __init__(self, niveau):  # parent = niveau$/;"	m	class:Sentier
-__init__	interface_modele.py	/^    def __init__(self, niveau):$/;"	m	class:Sentier2
-__init__	interface_modele.py	/^    def __init__(self, niveau, nbCreeps):$/;"	m	class:Vague
+__init__	interface_modele.py	/^    def __init__(self, niveau):  # parent = niveau$/;"	m	class:SentierN1
+__init__	interface_modele.py	/^    def __init__(self, niveau):$/;"	m	class:SentierN2
+__init__	interface_modele.py	/^    def __init__(self, niveau):$/;"	m	class:Vague
 __init__	interface_modele.py	/^    def __init__(self, niveau, x, y, typeTour):$/;"	m	class:IconeTour
 __init__	interface_modele.py	/^    def __init__(self, niveau,x,y):$/;"	m	class:Tour
 __init__	interface_modele.py	/^    def __init__(self, niveau,x,y):$/;"	m	class:Tour_Canon
@@ -62,23 +62,27 @@ __init__	interface_modele.py	/^    def __init__(self, vague):$/;"	m	class:CreepB
 __init__	interface_modele.py	/^    def __init__(self, x, y, largeur, hauteur):$/;"	m	class:Rect
 __init__	interface_modele.py	/^    def __init__(self, x, y, rayon):$/;"	m	class:Cercle
 __init__	interface_vue.py	/^    def __init__(self, controleur, largeur, hauteur):$/;"	m	class:Vue
-afficherArgent	interface_vue.py	/^    def afficherArgent(self, argent):$/;"	m	class:Vue
+afficherArgent	interface_vue.py	/^    def afficherArgent(self, argent, x, y):$/;"	m	class:Vue
 afficherConstructionAnnulee	interface_vue.py	/^    def afficherConstructionAnnulee(self):$/;"	m	class:Vue
 afficherCreeps	interface_vue.py	/^    def afficherCreeps(self, vague):$/;"	m	class:Vue
 afficherDescriptionTour	interface_controleur.py	/^    def afficherDescriptionTour(self,tour):$/;"	m	class:Controleur
 afficherDescriptionTour	interface_vue.py	/^    def afficherDescriptionTour(self, tour):$/;"	m	class:Vue
+afficherDommageCreep	interface_vue.py	/^    def afficherDommageCreep(self, creep):$/;"	m	class:Vue
 afficherGameOver	interface_vue.py	/^    def afficherGameOver(self):$/;"	m	class:Vue
-afficherMenuFinDePartie	interface_vue.py	/^    def afficherMenuFinDePartie(self):$/;"	m	class:Vue
+afficherMenuEnd	interface_vue.py	/^    def afficherMenuEnd(self):$/;"	m	class:Vue
+afficherMenuGameOver	interface_vue.py	/^    def afficherMenuGameOver(self):$/;"	m	class:Vue
+afficherMenuInterNiveau	interface_vue.py	/^    def afficherMenuInterNiveau(self):$/;"	m	class:Vue
 afficherPasDargent	interface_vue.py	/^    def afficherPasDargent(self):$/;"	m	class:Vue
 afficherProjectiles	interface_vue.py	/^    def afficherProjectiles(self, jeu):$/;"	m	class:Vue
-afficherPtsVie	interface_vue.py	/^    def afficherPtsVie(self, ptsVie):$/;"	m	class:Vue
-afficherStats	interface_vue.py	/^    def afficherStats(self, argent, ptsVie):$/;"	m	class:Vue
+afficherPtsVie	interface_vue.py	/^    def afficherPtsVie(self, ptsVie, x, y):$/;"	m	class:Vue
+afficherScore	interface_vue.py	/^    def afficherScore(self, score, x, y):$/;"	m	class:Vue
+afficherStats	interface_vue.py	/^    def afficherStats(self, argent, ptsVie, score):$/;"	m	class:Vue
 animer	interface_controleur.py	/^    def animer(self):$/;"	m	class:Controleur
 annulerClicks	interface_controleur.py	/^    def annulerClicks(self):$/;"	m	class:Controleur
 annulerClicks	interface_vue.py	/^    def annulerClicks(self): #En cas de gameOver si on annule pas le bind on peut continuer à co/;"	m	class:Vue
 attaquerCible	interface_modele.py	/^    def attaquerCible(self):$/;"	m	class:Tour
 attaquerCreeps	interface_modele.py	/^    def attaquerCreeps(self, creep):$/;"	m	class:Niveau
-bougerProjectile	interface_modele.py	/^    def bougerProjectile(self, projectile):$/;"	m	class:Jeu
+bougerProjectile	interface_modele.py	/^    def bougerProjectile(self):$/;"	m	class:Projectile
 c	interface_controleur.py	/^    c=Controleur()$/;"	v
 calcAngle	helper.py	/^    calcAngle = staticmethod(calcAngle)$/;"	v	class:Helper
 calcAngle	helper.py	/^    def calcAngle(x1,y1,x2,y2):$/;"	m	class:Helper
@@ -90,7 +94,10 @@ calculerEtendueDommage	interface_modele.py	/^    def calculerEtendueDommage(self
 calculerTrajectoire	interface_modele.py	/^    def calculerTrajectoire(self):$/;"	m	class:Projectile
 constructionAnnulee	interface_controleur.py	/^    def constructionAnnulee(self):$/;"	m	class:Controleur
 construireTour	interface_modele.py	/^    def construireTour(self, typeTour, x,y): #x et y sont les coordonnées de l'aire de construct/;"	m	class:Niveau
-creerProjectile	interface_modele.py	/^    def creerProjectile(self, tour):                $/;"	m	class:Jeu
+creerProjectile	interface_modele.py	/^    def creerProjectile(self):                $/;"	m	class:Tour_Canon
+creerProjectile	interface_modele.py	/^    def creerProjectile(self):                $/;"	m	class:Tour_Feu
+creerProjectile	interface_modele.py	/^    def creerProjectile(self):                $/;"	m	class:Tour_Goo
+creerProjectile	interface_modele.py	/^    def creerProjectile(self):                $/;"	m	class:Tour_Roche
 definirTypeTour	interface_modele.py	/^    def definirTypeTour(self):$/;"	m	class:IconeTour
 definirVecteur	interface_modele.py	/^    def definirVecteur(self):$/;"	m	class:Creep
 deplacerProjectile	interface_modele.py	/^    def deplacerProjectile(self):$/;"	m	class:Projectile
@@ -104,12 +111,12 @@ dessinerInterfaceJeu	interface_vue.py	/^    def dessinerInterfaceJeu(self,interf
 dessinerTour	interface_vue.py	/^    def dessinerTour(self, tour):$/;"	m	class:Vue
 dessinerUneAire	interface_vue.py	/^    def dessinerUneAire(self, aire):$/;"	m	class:Vue
 dessinerUneIconeTour	interface_vue.py	/^    def dessinerUneIconeTour(self,iconeTour):$/;"	m	class:Vue
-dessinerUneTour	interface_vue.py	/^    def dessinerUneTour(self,tour):$/;"	m	class:Vue
+dessinerUneTour	interface_vue.py	/^    def dessinerUneTour(self, tour):$/;"	m	class:Vue
 detecterClick	interface_vue.py	/^    def detecterClick(self):$/;"	m	class:Vue
 detecterClickDroit	interface_vue.py	/^    def detecterClickDroit(self):$/;"	m	class:Vue
 disposerEcran	interface_vue.py	/^    def disposerEcran(self, sentier):$/;"	m	class:Vue
 effacerAnimationPrecedente	interface_vue.py	/^    def effacerAnimationPrecedente(self):$/;"	m	class:Vue
-effacerCreep	interface_modele.py	/^    def effacerCreep(self, creep, projectile):$/;"	m	class:Jeu
+effacerCreep	interface_modele.py	/^    def effacerCreep(self, projectile):$/;"	m	class:Creep
 effacerDescriptionTour	interface_controleur.py	/^    def effacerDescriptionTour(self):$/;"	m	class:Controleur
 effacerDescriptionTour	interface_vue.py	/^    def effacerDescriptionTour(self):$/;"	m	class:Vue
 effacerNiveau	interface_vue.py	/^    def effacerNiveau(self):$/;"	m	class:Vue
@@ -119,7 +126,9 @@ event_click_droit	interface_controleur.py	/^    def event_click_droit(self,event
 event_click_droit	interface_modele.py	/^    def event_click_droit(self, event): $/;"	m	class:Jeu
 faireAction	interface_modele.py	/^    def faireAction(self):$/;"	m	class:Jeu
 genererAiresConstruction	interface_modele.py	/^    def genererAiresConstruction(self):$/;"	m	class:Niveau
+genererCreep	interface_modele.py	/^    def genererCreep(self):$/;"	m	class:Vague
 genererIconesTours	interface_modele.py	/^    def genererIconesTours(self):$/;"	m	class:Niveau
+genererSentier	interface_modele.py	/^    def genererSentier(self):$/;"	m	class:Niveau
 getAngledPoint	helper.py	/^    def getAngledPoint(angle,longueur,cx,cy):$/;"	m	class:Helper
 getAngledPoint	helper.py	/^    getAngledPoint = staticmethod(getAngledPoint)$/;"	v	class:Helper
 ifIntersectRect	interface_modele.py	/^    def ifIntersectRect(self, rect):$/;"	m	class:Cercle
@@ -129,14 +138,15 @@ isInside	interface_modele.py	/^    def isInside(self, x,y):$/;"	m	class:Rect
 iv	interface_controleur.py	/^import interface_vue as iv$/;"	I
 manqueDargent	interface_controleur.py	/^    def manqueDargent(self):$/;"	m	class:Controleur
 nouvelleTour	interface_controleur.py	/^    def nouvelleTour(self, tour):$/;"	m	class:Controleur
-quitter	interface_vue.py	/^    def quitter(self):$/;"	m	class:Vue
-reJouer	interface_vue.py	/^    def reJouer(self):$/;"	m	class:Vue
+passerNiveauSuivant	interface_vue.py	/^    def passerNiveauSuivant(self,a):$/;"	m	class:Vue
+quitter	interface_vue.py	/^    def quitter(self,a):$/;"	m	class:Vue
 siCreepDansRange	interface_modele.py	/^    def siCreepDansRange(self, creep):$/;"	m	class:Tour
 soustrairePtsVieCreep	interface_modele.py	/^    def soustrairePtsVieCreep(self, projectile):$/;"	m	class:Creep
 suivreSentier	interface_modele.py	/^    def suivreSentier(self):$/;"	m	class:Creep
 transfererValeurCreep	interface_modele.py	/^    def transfererValeurCreep(self):$/;"	m	class:Creep
 verifierAtteinteDesCibles	interface_modele.py	/^    def verifierAtteinteDesCibles(self, creep):$/;"	m	class:Projectile
 verifierAtteinteDesCibles	interface_modele.py	/^    def verifierAtteinteDesCibles(self, creep):$/;"	m	class:Projectile_Circulaire
+verifierAtteinteDesCibles	interface_modele.py	/^    def verifierAtteinteDesCibles(self, creep):$/;"	m	class:Projectile_Goo
 verifierFinNiveau	interface_modele.py	/^    def verifierFinNiveau(self):$/;"	m	class:Partie
 verifierFinSentier	interface_modele.py	/^    def verifierFinSentier(self):$/;"	m	class:Creep
 verifierGameOver	interface_modele.py	/^    def verifierGameOver(self):$/;"	m	class:Partie
