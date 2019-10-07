@@ -1,7 +1,7 @@
 # -*- coding: iso-8859-1 -*-
 
 import helper
-#import winsound #TODO: winsound
+import winsound #TODO: winsound
 
 # Trello?
 #TODO: Animation des sprites
@@ -42,6 +42,7 @@ class Jeu():
                 elif (self.prtControleur.msTime % i.freqAttaque) == 0:
                     i.creerProjectile()
                     #winsound.PlaySound(i.son, winsound.SND_FILENAME | winsound.SND_ASYNC)
+                            
             for j in i.listProjectiles:
                 j.bougerProjectile()
 
@@ -153,7 +154,7 @@ class Niveau():
         # ^-- pour que ce soit la base de la tour qui est sur l'aire.
         self.listTours.append(tour)
         self.prtPartie.prtJeu.prtControleur.nouvelleTour(tour)
-#        winsound.PlaySound(tour.sonConstruction, winsound.SND_FILENAME | winsound.SND_ASYNC) #TODO: winsound
+        winsound.PlaySound(tour.sonConstruction, winsound.SND_FILENAME | winsound.SND_ASYNC) #TODO: winsound
         
     #Création des aires de construction selon le tableau défini dans la classe Partie
     def genererAiresConstruction(self):
@@ -325,7 +326,7 @@ class Creep():
     def transfererValeurCreep(self):
         self.prtVague.prtNiveau.prtPartie.argentJoueur += self.valeur
         self.prtVague.prtNiveau.prtPartie.score += self.valeur
-#        winsound.PlaySound(self.son, winsound.SND_FILENAME | winsound.SND_ASYNC) #TODO: winsound
+        winsound.PlaySound(self.son, winsound.SND_FILENAME | winsound.SND_ASYNC) #TODO: winsound
 
     def verifierFinSentier(self):
         chemin = self.prtVague.prtNiveau.sentier.chemin
@@ -645,7 +646,7 @@ class Zone_description():
         self.posY = 525
         self.largeur = 175
         self.hauteur = 62
-        self.couleur="gray21"
+        self.couleur="gray31"
 
 class Cercle():
     def __init__(self, x, y, rayon):
